@@ -26,9 +26,11 @@ import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -71,6 +73,7 @@ public class RobotContainer {
     /** ************ */
     private void configureDefaultCommands() {
         swerve.setDefaultCommand(new SwerveDriveDrive(driver));
+        
     }
 
     /***************/
@@ -81,7 +84,7 @@ public class RobotContainer {
      * This method is used to configure button bindings for controlling the robot.
    */
     private void configureButtonBindings() {
-      
+        driver.povUp().onTrue(Commands.runOnce(() -> swerve.resetHeading(Rotation2d.kZero)));
     }
 
     /**************/
