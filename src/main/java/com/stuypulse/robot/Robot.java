@@ -13,16 +13,10 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.stuypulse.robot.commands.auton.bline.BLineAuton;
-import com.stuypulse.robot.commands.shooter.ShooterSetShoot;
-import com.stuypulse.robot.commands.vision.SetMegaTagMode;
-import com.stuypulse.robot.commands.vision.SetVisionEnabled;
 import com.stuypulse.robot.constants.Settings;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.util.FullSubsystem;
 import com.stuypulse.robot.util.LoggedSignals;
-import com.stuypulse.robot.util.simulation.RobotVisualizer;
-import com.stuypulse.robot.util.simulation.SimulationConstants;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -39,8 +33,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends LoggedRobot {
 
     private RobotContainer robot;
-
-    private BLineAuton auto;
 
     /**
      * Checks the alliance the robot is on
@@ -112,8 +104,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationInit() {
         // start off in a convenient spot
-        Swerve.getInstance()
-            .resetPose(SimulationConstants.ROBOTS_STARTING_POSITIONS[0]);
+        // Swerve.getInstance()
+            // .resetPose(SimulationConstants.ROBOTS_STARTING_POSITIONS[0]);
     }
 
     /**
@@ -122,7 +114,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         // Simulation.getInstance().update();
-        RobotVisualizer.getInstance().update();
+        // RobotVisualizer.getInstance().update();
     }
 
     /*********************/
@@ -144,20 +136,20 @@ public class Robot extends LoggedRobot {
     public void disabledPeriodic() {
         // CommandScheduler.getInstance().schedule(new SetIMUMode(1));
 
-        if (auto != robot.getAutonomousCommand() && auto != null) {
-            auto.clearPaths();
-
-            auto = robot.getAutonomousCommand();
-
-            auto.displayPaths();
-        } 
+        // if (auto != robot.getAutonomousCommand() && auto != null) {
+            // auto.clearPaths();
+// 
+            // auto = robot.getAutonomousCommand();
+// 
+            // auto.displayPaths();
+        // } 
         
-        if (auto == null) {
-            auto = robot.getAutonomousCommand();
-            if (auto != null) {
-                auto.displayPaths();
-            }
-        }
+        // if (auto == null) {
+        //     auto = robot.getAutonomousCommand();
+        //     if (auto != null) {
+        //         auto.displayPaths();
+        //     }
+        // }
     }
 
     /***********************/
@@ -169,17 +161,17 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
-        if (auto != null) {
-            auto.clearPaths();
-        }
+        // if (auto != null) {
+        //     auto.clearPaths();
+        // }
 
-        auto = robot.getAutonomousCommand();
-        // CommandScheduler.getInstance().schedule(new SetIMUMode(4));
-        // CommandScheduler.getInstance().schedule(new WhitelistAllTags());
-        // Vision.getInstance().disable();
-        if (auto != null) {
-            CommandScheduler.getInstance().schedule(auto);
-        }
+        // auto = robot.getAutonomousCommand();
+        // // CommandScheduler.getInstance().schedule(new SetIMUMode(4));
+        // // CommandScheduler.getInstance().schedule(new WhitelistAllTags());
+        // // Vision.getInstance().disable();
+        // if (auto != null) {
+        //     CommandScheduler.getInstance().schedule(auto);
+        // }
     }
 
     /**
@@ -208,15 +200,15 @@ public class Robot extends LoggedRobot {
     public void teleopInit() {
         // CommandScheduler.getInstance().schedule(new SetIMUMode(4));
         // CommandScheduler.getInstance().schedule(new WhitelistAllTags());
-        CommandScheduler.getInstance().schedule(new ShooterSetShoot()); // start at SHOOT state
-        if (auto != null) {
-            auto.clearPaths();
-            auto.cancel();
-        }
-        CommandScheduler.getInstance().schedule(new SetVisionEnabled());
-        Boolean autonWon = DriverStation.getGameSpecificMessage()
-                .equals(isBlue() ? "B" : "R");
-        Logger.recordOutput("Auton Won", autonWon);
+        // CommandScheduler.getInstance().schedule(new ShooterSetShoot()); // start at SHOOT state
+        // if (auto != null) {
+        //     auto.clearPaths();
+        //     auto.cancel();
+        // }
+        // CommandScheduler.getInstance().schedule(new SetVisionEnabled());
+        // Boolean autonWon = DriverStation.getGameSpecificMessage()
+        //         .equals(isBlue() ? "B" : "R");
+        // Logger.recordOutput("Auton Won", autonWon);
     }
 
     /**

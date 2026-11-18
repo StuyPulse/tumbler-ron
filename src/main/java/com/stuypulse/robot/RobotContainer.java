@@ -5,13 +5,7 @@
 /***************************************************************/
 package com.stuypulse.robot;
 
-import com.stuypulse.robot.commands.auton.bline.BLineAuton;
-import com.stuypulse.robot.commands.auton.bline.CenterDepotBLine;
-import com.stuypulse.robot.commands.auton.bline.FrontHubShootBLine;
-import com.stuypulse.robot.commands.auton.bline.LBDumpyBLine;
-import com.stuypulse.robot.commands.auton.bline.OutpostOnlyBLine;
-import com.stuypulse.robot.commands.auton.bline.RBDumpyBLine;
-import com.stuypulse.robot.commands.auton.bline.TwoMeterTestBLine;
+import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 // import com.stuypulse.robot.commands.auton.defensive.LBDisrupt;
 // import com.stuypulse.robot.commands.auton.defensive.LBFerry;
 // import com.stuypulse.robot.commands.auton.defensive.RBDisrupt;
@@ -20,24 +14,6 @@ import com.stuypulse.robot.commands.auton.bline.TwoMeterTestBLine;
 // import com.stuypulse.robot.commands.auton.shooting.LBDumpy;
 // import com.stuypulse.robot.commands.auton.shooting.RBDumpy;
 // import com.stuypulse.robot.commands.auton.structures.CenterDepot;
-import com.stuypulse.robot.commands.auton.test.DoNothingAuton;
-// import com.stuypulse.robot.commands.auton.test.TwoMeterTest;
-import com.stuypulse.robot.commands.compound.StopShooting;
-import com.stuypulse.robot.commands.feeder.FeederScramble;
-import com.stuypulse.robot.commands.feeder.FeederSetForward;
-import com.stuypulse.robot.commands.handoff.HandoffSetForward;
-import com.stuypulse.robot.commands.intake.IntakeAgitateFastOnce;
-import com.stuypulse.robot.commands.intake.IntakeSetDown;
-import com.stuypulse.robot.commands.intake.IntakeSetIdle;
-import com.stuypulse.robot.commands.intake.IntakeSetIntake;
-import com.stuypulse.robot.commands.intake.IntakeSetOuttake;
-import com.stuypulse.robot.commands.leds.LEDDefaultCommand;
-import com.stuypulse.robot.commands.shooter.ShooterFirstShotIncrease;
-import com.stuypulse.robot.commands.shooter.ShooterSetFerry;
-import com.stuypulse.robot.commands.shooter.ShooterSetManual;
-import com.stuypulse.robot.commands.shooter.ShooterSetShoot;
-import com.stuypulse.robot.commands.shooter.ShooterWaitForSpinUp;
-import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.commands.swerve.SwerveDriveResetRotation;
 import com.stuypulse.robot.commands.swerve.SwerveDriveXMode;
 import com.stuypulse.robot.commands.swerve.SwerveIgnoreJoysticks;
@@ -49,7 +25,6 @@ import com.stuypulse.robot.constants.Field;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
-import com.stuypulse.robot.util.BlineUtil.BLineConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -76,7 +51,6 @@ public class RobotContainer {
     private final Swerve swerve = Swerve.getInstance();
 
     // Autons
-    private static SendableChooser<BLineAuton> autonChooser = new SendableChooser<>();
 
     // Robot container
 
@@ -107,83 +81,7 @@ public class RobotContainer {
      * This method is used to configure button bindings for controlling the robot.
    */
     private void configureButtonBindings() {
-        // Trigger buttons did not work for some reason so I had to do this
-        Trigger leftTrigger = new Trigger(() -> driver.getLeftTriggerAxis() > 0.5);
-        Trigger rightTrigger = new Trigger(() -> driver.getRightTriggerAxis() > 0.5);
-
-                    .alongWith(new FeederSetForward(),
-                        new IntakeAgitateFastOnce().repeatedly(),
-                        new ShooterFirstShotIncrease())));
-        rightTrigger.onFalse(
-            new StopShooting().alongWith(new SwerveUseJoysticks())
-        );
-
-        // Top Left Paddle
-        driver.y().onTrue(new IntakeSetIdle());
-        
-        driver.rightBumper()
-            .whileTrue(
-                new WaitCommand(1.5).raceWith(new SwerveDriveAlignToFerryZone())
-                    .andThen(new SwerveDriveXMode())
-                    .andThen(new ShooterSetFerry())
-                    .andThen(new ShooterWaitForSpinUp().withDeadline(new FeederScramble()))
-                    .andThen(new HandoffSetForward()
-                        .alongWith(
-                            new FeederSetForward(),
-                            new IntakeAgitateFastOnce().repeatedly(),
-                            new ShooterFirstShotIncrease())));
-        driver.rightBumper()
-            .onFalse(
-                new StopShooting()
-            );
-        // Manual shooting possibly from in front of the tower
-        driver.a()
-            .whileTrue(
-                new SwerveDriveXMode()
-                    .andThen(new ShooterSetManual())
-                    .andThen(new ShooterWaitForSpinUp().withDeadline(new FeederScramble()))
-                    .andThen(new HandoffSetForward()
-                        .alongWith(
-                            new FeederSetForward(),
-                            new IntakeAgitateFastOnce().repeatedly(),
-                            new ShooterFirstShotIncrease())));
-        // driver.a()
-        //     .whileTrue(new SwerveResetPose(Field::getManualShotPose).repeatedly());
-        driver.a()
-            .onFalse(
-                new StopShooting()
-            );
-
-        driver.b()  
-            .whileTrue(
-                new SwerveDriveXMode()
-                    .andThen(new ShooterSetShoot())
-                    .andThen(new ShooterWaitForSpinUp().withDeadline(new FeederScramble()))
-                    .andThen(new HandoffSetForward()
-                    .alongWith(
-                        new FeederSetForward(),
-                        new IntakeAgitateFastOnce().repeatedly(),
-                        new ShooterFirstShotIncrease()))
-            );
-        driver.b()
-            .onFalse(
-                new StopShooting()
-            );
-
-        // Bottom Left Paddle
-        driver.x().onTrue(new IntakeSetDown());
-        
-        // driver.x().whileTrue(new SwerveDriveXMode());
-
-        driver.povLeft().onTrue(new SwerveDriveResetRotation());
-        
-        // driver.povUp()
-        //     .onTrue(new ShooterAddToBonusVelocity(50));
-        // driver.povDown()
-        //     .onTrue(new ShooterAddToBonusVelocity(-50));
-        // driver.povRight()
-        //     .onTrue(new ShooterResetBonusVelocity());
-
+      
     }
 
     /**************/
@@ -194,7 +92,6 @@ public class RobotContainer {
      * This method is used to configure the autonomous commands.
      */
      public void configureAutons() {
-        autonChooser.addOption("Do Nothing", new DoNothingAuton());
         // SHOOT
 
         // AutonConfig centerDepot = new AutonConfig("Center Depot", CenterDepot::new,
@@ -257,45 +154,65 @@ public class RobotContainer {
         // );
         // RB_Disrupt.register(autonChooser);
 
-        BLineConfig LB_DUMPY_BLINE = new BLineConfig("LB Dumpy Bline", LBDumpyBLine::new,
-        "dumpy-lb-to-nz",
-            "dumpy-lb-nz-intake",
-            "dumpy-lb-backsweep",
-            "dumpy-lb-shoot"
-        );
-        LB_DUMPY_BLINE.register(autonChooser);
+        // BLineConfig LB_DUMPY_BLINE = new BLineConfig("LB Dumpy Bline", LBDumpyBLine::new,
+        // "dumpy-lb-to-nz",
+        //     "dumpy-lb-nz-intake",
+        //     "dumpy-lb-backsweep",
+        //     "dumpy-lb-shoot"
+        // );
+        // LB_DUMPY_BLINE.register(autonChooser);
 
-        BLineConfig RB_DUMPY_BLINE = new BLineConfig("RB Dumpy Bline", RBDumpyBLine::new,
-            "dumpy-rb-to-nz",
-            "dumpy-rb-nz-intake",
-            "dumpy-rb-backsweep",
-            "dumpy-rb-shoot"
-        );
-        RB_DUMPY_BLINE.register(autonChooser);
+        // BLineConfig RB_DUMPY_BLINE = new BLineConfig("RB Dumpy Bline", RBDumpyBLine::new,
+        //     "dumpy-rb-to-nz",
+        //     "dumpy-rb-nz-intake",
+        //     "dumpy-rb-backsweep",
+        //     "dumpy-rb-shoot"
+        // );
+        // RB_DUMPY_BLINE.register(autonChooser);
 
-        BLineConfig FRONT_HUB_SHOOT_BLINE = new BLineConfig("Front Hub Shoot Bline", FrontHubShootBLine::new,
-            "front-hub-shoot"
-        );
-        FRONT_HUB_SHOOT_BLINE.register(autonChooser);
+        // BLineConfig FRONT_HUB_SHOOT_BLINE = new BLineConfig("Front Hub Shoot Bline", FrontHubShootBLine::new,
+        //     "front-hub-shoot"
+        // );
+        // FRONT_HUB_SHOOT_BLINE.register(autonChooser);
 
-        BLineConfig CENTER_DEPOT_BLINE = new BLineConfig("Center Depot Bline", CenterDepotBLine::new,
-            "hub-to-depot",
-            "tower-shoot"
-        );
-        CENTER_DEPOT_BLINE.register(autonChooser);
+        // BLineConfig CENTER_DEPOT_BLINE = new BLineConfig("Center Depot Bline", CenterDepotBLine::new,
+        //     "hub-to-depot",
+        //     "tower-shoot"
+        // );
+        // CENTER_DEPOT_BLINE.register(autonChooser);
 
-        BLineConfig OUTPOST_ONLY_BLINE = new BLineConfig("Outpost Only Bline", OutpostOnlyBLine::new,
-            "outpost"
-        );
-        OUTPOST_ONLY_BLINE.register(autonChooser);
+        // BLineConfig OUTPOST_ONLY_BLINE = new BLineConfig("Outpost Only Bline", OutpostOnlyBLine::new,
+        //     "outpost"
+        // );
+        // OUTPOST_ONLY_BLINE.register(autonChooser);
 
-        BLineConfig TWO_METER_TEST_BLINE = new BLineConfig("Two Meter Test Bline", TwoMeterTestBLine::new,
-            "two-meter"
-        );
-        TWO_METER_TEST_BLINE.register(autonChooser);
+        // BLineConfig TWO_METER_TEST_BLINE = new BLineConfig("Two Meter Test Bline", TwoMeterTestBLine::new,
+        //     "two-meter"
+        // );
+        // TWO_METER_TEST_BLINE.register(autonChooser);
 
         
 
+        // // autonChooser.addOption("SysID Module Translation Dynamic Forwards",
+        // // swerve.sysIdDynamic(Direction.kForward));
+        // // autonChooser.addOption("SysID Module Translation Dynamic Backwards",
+        // // swerve.sysIdDynamic(Direction.kReverse));
+        // // autonChooser.addOption("SysID Module Translation Quasi Forwards",
+        // // swerve.sysIdQuasistatic(Direction.kForward));
+        // // autonChooser.addOption("SysID Module Translation Quasi Backwards",
+        // // swerve.sysIdQuasistatic(Direction.kReverse));
+        // // autonChooser.addOption("SysID Rotation Translation Dynamic Forwards",
+        // // swerve.sysidRotationDynamic(Direction.kForward));
+        // // autonChooser.addOption("SysID Rotation Translation Dynamic Backwards",
+        // // swerve.sysidRotationDynamic(Direction.kReverse));
+        // // autonChooser.addOption("SysID Rotation Translation Quasi Forwards",
+        // // swerve.sysidRotationQuasiStatic(Direction.kForward));
+        // // autonChooser.addOption("SysID Rotation Translation Quasi Backwards",
+        // // swerve.sysidRotationQuasiStatic(Direction.kReverse));
+        // SmartDashboard.putData("Autonomous", autonChooser);
+    }
+    
+    public void configureSysID() {
         // autonChooser.addOption("SysID Module Translation Dynamic Forwards",
         // swerve.sysIdDynamic(Direction.kForward));
         // autonChooser.addOption("SysID Module Translation Dynamic Backwards",
@@ -304,35 +221,15 @@ public class RobotContainer {
         // swerve.sysIdQuasistatic(Direction.kForward));
         // autonChooser.addOption("SysID Module Translation Quasi Backwards",
         // swerve.sysIdQuasistatic(Direction.kReverse));
-        // autonChooser.addOption("SysID Rotation Translation Dynamic Forwards",
-        // swerve.sysidRotationDynamic(Direction.kForward));
-        // autonChooser.addOption("SysID Rotation Translation Dynamic Backwards",
-        // swerve.sysidRotationDynamic(Direction.kReverse));
-        // autonChooser.addOption("SysID Rotation Translation Quasi Forwards",
-        // swerve.sysidRotationQuasiStatic(Direction.kForward));
-        // autonChooser.addOption("SysID Rotation Translation Quasi Backwards",
-        // swerve.sysidRotationQuasiStatic(Direction.kReverse));
-        SmartDashboard.putData("Autonomous", autonChooser);
-    }
-    
-    public void configureSysID() {
-        autonChooser.addOption("SysID Module Translation Dynamic Forwards",
-        swerve.sysIdDynamic(Direction.kForward));
-        autonChooser.addOption("SysID Module Translation Dynamic Backwards",
-        swerve.sysIdDynamic(Direction.kReverse));
-        autonChooser.addOption("SysID Module Translation Quasi Forwards",
-        swerve.sysIdQuasistatic(Direction.kForward));
-        autonChooser.addOption("SysID Module Translation Quasi Backwards",
-        swerve.sysIdQuasistatic(Direction.kReverse));
 
-        autonChooser.addOption("Swerve FF Characterization", swerve.feedforwardCharacterization());
+        // autonChooser.addOption("Swerve FF Characterization", swerve.feedforwardCharacterization());
     }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      * @return The command to run in autonomous
      */
-    public BLineAuton getAutonomousCommand() {
-        return autonChooser.getSelected();
-    }
+    // public BLineAuton getAutonomousCommand() {
+        // return autonChooser.getSelected();
+    // }
 }
