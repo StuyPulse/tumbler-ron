@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RB to N Dumpy"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RB Intake Dumpy"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RB Backsweep Dumpy"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RB Shoot Dumpy"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Dumpy",
+  "choreoAuto": false
+}

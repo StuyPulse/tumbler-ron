@@ -1,0 +1,53 @@
+name: "DogLog Replacer"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run AST Replacer
+        run: ./gradlew runDogLogAST
+
+      - name: Add DogLog vendordep
+        run: ./gradlew vendordep --url=https://doglog.dev/vendordep.json
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B feat/doglog
+
+          git add .
+          git commit -m "Replace SmartDashboard with DogLog" || echo "No changes to commit"
+
+      - name: Force push to doglog branch
+        run: git push origin feat/doglog --force
