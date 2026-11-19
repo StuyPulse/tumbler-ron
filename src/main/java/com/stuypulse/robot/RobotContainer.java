@@ -6,35 +6,14 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
-// import com.stuypulse.robot.commands.auton.defensive.LBDisrupt;
-// import com.stuypulse.robot.commands.auton.defensive.LBFerry;
-// import com.stuypulse.robot.commands.auton.defensive.RBDisrupt;
-// import com.stuypulse.robot.commands.auton.defensive.RBFerry;
-// import com.stuypulse.robot.commands.auton.shooting.FrontHubShootPreloads;
-// import com.stuypulse.robot.commands.auton.shooting.LBDumpy;
-// import com.stuypulse.robot.commands.auton.shooting.RBDumpy;
-// import com.stuypulse.robot.commands.auton.structures.CenterDepot;
-import com.stuypulse.robot.commands.swerve.SwerveDriveResetRotation;
-import com.stuypulse.robot.commands.swerve.SwerveDriveXMode;
-import com.stuypulse.robot.commands.swerve.SwerveIgnoreJoysticks;
-import com.stuypulse.robot.commands.swerve.SwerveResetPose;
-import com.stuypulse.robot.commands.swerve.SwerveUseJoysticks;
-import com.stuypulse.robot.commands.swerve.driveAligned.SwerveDriveAlignToFerryZone;
-import com.stuypulse.robot.commands.swerve.driveAligned.SwerveDriveAlignToHub;
 import com.stuypulse.robot.constants.Field;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 /**
  * <h2>Robot Container Class</h2>

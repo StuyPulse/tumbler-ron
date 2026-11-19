@@ -14,7 +14,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.stuypulse.robot.constants.Settings;
-import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.util.FullSubsystem;
 import com.stuypulse.robot.util.LoggedSignals;
 
@@ -31,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * This robot is structured using the <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html">CommandBased</a> framework.
  */
 public class Robot extends LoggedRobot {
-
     private RobotContainer robot;
 
     /**
@@ -102,20 +100,13 @@ public class Robot extends LoggedRobot {
      * This method is called when the robot first starts in simulation mode.
      */
     @Override
-    public void simulationInit() {
-        // start off in a convenient spot
-        // Swerve.getInstance()
-            // .resetPose(SimulationConstants.ROBOTS_STARTING_POSITIONS[0]);
-    }
+    public void simulationInit() {}
 
     /**
      * This method is called every 20ms during simulation mode.
      */
     @Override
-    public void simulationPeriodic() {
-        // Simulation.getInstance().update();
-        // RobotVisualizer.getInstance().update();
-    }
+    public void simulationPeriodic() {}
 
     /*********************/
     /*** DISABLED MODE ***/
@@ -125,32 +116,13 @@ public class Robot extends LoggedRobot {
      * This method is called each time when the robot is disabled.
      */
     @Override
-    public void disabledInit() {
-        // CommandScheduler.getInstance().schedule(new SetIMUMode(1));
-    }
+    public void disabledInit() {}
 
     /**
      * This method is called every 20ms when the robot is disabled.
      */
     @Override
-    public void disabledPeriodic() {
-        // CommandScheduler.getInstance().schedule(new SetIMUMode(1));
-
-        // if (auto != robot.getAutonomousCommand() && auto != null) {
-            // auto.clearPaths();
-// 
-            // auto = robot.getAutonomousCommand();
-// 
-            // auto.displayPaths();
-        // } 
-        
-        // if (auto == null) {
-        //     auto = robot.getAutonomousCommand();
-        //     if (auto != null) {
-        //         auto.displayPaths();
-        //     }
-        // }
-    }
+    public void disabledPeriodic() {}
 
     /***********************/
     /*** AUTONOMOUS MODE ***/
@@ -160,34 +132,19 @@ public class Robot extends LoggedRobot {
      * This method is called at the start of autonomous mode.
      */
     @Override
-    public void autonomousInit() {
-        // if (auto != null) {
-        //     auto.clearPaths();
-        // }
-
-        // auto = robot.getAutonomousCommand();
-        // // CommandScheduler.getInstance().schedule(new SetIMUMode(4));
-        // // CommandScheduler.getInstance().schedule(new WhitelistAllTags());
-        // // Vision.getInstance().disable();
-        // if (auto != null) {
-        //     CommandScheduler.getInstance().schedule(auto);
-        // }
-    }
+    public void autonomousInit() {}
 
     /**
      * This method is called every 20ms during autonomous mode.
      */
     @Override
-    public void autonomousPeriodic() {
-    }
+    public void autonomousPeriodic() {}
 
     /**
      * This method is called when autonomous mode ends.
      */
     @Override
-    public void autonomousExit() {
-        // Vision.getInstance().captureRewind(25);
-    }
+    public void autonomousExit() {}
 
     /*******************/
     /*** TELEOP MODE ***/
@@ -197,34 +154,19 @@ public class Robot extends LoggedRobot {
      * This method is called at the start of teleop mode.
      */
     @Override
-    public void teleopInit() {
-        // CommandScheduler.getInstance().schedule(new SetIMUMode(4));
-        // CommandScheduler.getInstance().schedule(new WhitelistAllTags());
-        // CommandScheduler.getInstance().schedule(new ShooterSetShoot()); // start at SHOOT state
-        // if (auto != null) {
-        //     auto.clearPaths();
-        //     auto.cancel();
-        // }
-        // CommandScheduler.getInstance().schedule(new SetVisionEnabled());
-        // Boolean autonWon = DriverStation.getGameSpecificMessage()
-        //         .equals(isBlue() ? "B" : "R");
-        // Logger.recordOutput("Auton Won", autonWon);
-    }
+    public void teleopInit() {}
 
     /**
      * This method is called every 20ms in teleop mode.
      */
     @Override
-    public void teleopPeriodic() {
-    }
+    public void teleopPeriodic() {}
 
     /**
      * This method is called when teleop mode ends.
      */
     @Override
-    public void teleopExit() {
-        // Vision.getInstance().captureRewind(165);
-    }
+    public void teleopExit() {}
 
     /*****************/
     /*** TEST MODE ***/
@@ -242,13 +184,11 @@ public class Robot extends LoggedRobot {
      * This method is called every 20ms in test mode.
      */
     @Override
-    public void testPeriodic() {
-    }
+    public void testPeriodic() {}
 
     /**
      * This method is called when test mode ends.
      */
     @Override
-    public void testExit() {
-    }
+    public void testExit() {}
 }
