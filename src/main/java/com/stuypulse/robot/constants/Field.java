@@ -7,12 +7,12 @@ package com.stuypulse.robot.constants;
 
 import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-import com.stuypulse.robot.util.vision.AprilTag;
+
+import edu.wpi.first.math.geometry.Pose3d;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -31,7 +31,6 @@ import java.util.List;
 
 /** This interface stores information about the field elements. */
 public interface Field {
-
         public static final Field2d FIELD2D = new Field2d();
 
         double WIDTH = Units.inchesToMeters(317.000);
@@ -80,6 +79,8 @@ public interface Field {
         public static boolean inAllianceZone() {
                 return Swerve.getInstance().getPose().getX() < allianceZone.getX();
         }
+
+        public static record AprilTag(int id, Pose3d location) {}
 
         AprilTagFieldLayout APRIL_TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         /** APRILTAGS ** */
