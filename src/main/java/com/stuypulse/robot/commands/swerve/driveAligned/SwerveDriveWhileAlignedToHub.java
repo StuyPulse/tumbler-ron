@@ -5,12 +5,12 @@
 /***************************************************************/
 package com.stuypulse.robot.commands.swerve.driveAligned;
 
-import com.stuypulse.robot.constants.Field;
+import com.stuypulse.robot.constants.FieldConstants;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class SwerveDriveWhileAlignedToHub extends SwerveDriveDriveWhileAligned {
 
     public SwerveDriveWhileAlignedToHub(CommandXboxController driver) {
-        super(driver, Field::getHubPose);
+        super(driver, FieldConstants::getHubPose);
     }
 }

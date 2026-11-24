@@ -1,9 +1,13 @@
-package com.stuypulse.robot.util.logged.LoggedTalonFX;
+/************************ PROJECT ZIXI ************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
+package com.stuypulse.robot.util.talonfx.logged;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.stuypulse.robot.util.logged.LogTableUtil;
 import edu.wpi.first.units.measure.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +39,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
  * @author Faizaan (https://github.com/Faizaan-J)
  */
 public class TalonFXInputs implements LoggableInputs, Cloneable {
+    public boolean connected;
     public Current supplyCurrent = Amps.zero();
     public Current statorCurrent = Amps.zero();
     public Temperature temperature = Celsius.zero();
@@ -47,7 +52,8 @@ public class TalonFXInputs implements LoggableInputs, Cloneable {
     /**
      * Records additional StatusSignals to be logged.
      *
-     * @param signals The signals to log.
+     * @param name The name of the signal to log.
+     * @param value The value of the signal to log.
      */
     void recordAdditionalSignal(String name, Object value) {
         this.additionalSignalValues.put(name, value);
@@ -72,6 +78,7 @@ public class TalonFXInputs implements LoggableInputs, Cloneable {
 
     @Override
     public void toLog(LogTable table) {
+        table.put("Connected", connected);
         table.put("SupplyCurrent", supplyCurrent);
         table.put("StatorCurrent", statorCurrent);
         table.put("Temperature", temperature);
@@ -86,6 +93,7 @@ public class TalonFXInputs implements LoggableInputs, Cloneable {
 
     @Override
     public void fromLog(LogTable table) {
+        connected = table.get("Connected", connected);
         supplyCurrent = table.get("SupplyCurrent", supplyCurrent);
         statorCurrent = table.get("StatorCurrent", statorCurrent);
         temperature = table.get("Temperature", temperature);
@@ -101,6 +109,7 @@ public class TalonFXInputs implements LoggableInputs, Cloneable {
 
     public TalonFXInputs clone() {
         TalonFXInputs copy = new TalonFXInputs();
+        copy.connected = connected;
         copy.supplyCurrent = this.supplyCurrent;
         copy.statorCurrent = this.statorCurrent;
         copy.temperature = this.temperature;

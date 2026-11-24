@@ -13,9 +13,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.stuypulse.robot.constants.Settings;
-import com.stuypulse.robot.util.FullSubsystem;
-import com.stuypulse.robot.util.LoggedSignals;
+import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.util.PeriodicSubsystem;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -53,7 +52,7 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
         robot = new RobotContainer();
         
-        switch (Settings.CURRENT_MODE) {
+        switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
                 Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
@@ -86,10 +85,8 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotPeriodic() {
-        LoggedSignals.refreshAll();
-        
         CommandScheduler.getInstance().run();
-        FullSubsystem.runAllPeriodicAfterScheduler();
+        PeriodicSubsystem.runAllPeriodicAfterScheduler();
     }
 
     /******************/

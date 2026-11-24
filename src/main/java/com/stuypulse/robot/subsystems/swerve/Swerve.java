@@ -14,9 +14,10 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.stuypulse.robot.Robot;
-import com.stuypulse.robot.constants.Field;
-import com.stuypulse.robot.constants.Settings;
-import com.stuypulse.robot.constants.Settings.Mode;
+import com.stuypulse.robot.constants.FieldConstants;
+import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.constants.GlobalSettings.Mode;
+import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -75,7 +76,7 @@ public class Swerve extends SubsystemBase {
     
     private static final Swerve instance;
     static {
-        switch (Settings.CURRENT_MODE) {
+        switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
                 instance = 
                 new Swerve(
@@ -173,7 +174,7 @@ public class Swerve extends SubsystemBase {
                     this::getChassisSpeeds,
                     this::runVelocity,
                     new PPHolonomicDriveController(
-                            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+                            SwerveGains.XY, SwerveGains.THETA),
                     RobotConfig.fromGUISettings(),
                     () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                     this);
@@ -185,9 +186,9 @@ public class Swerve extends SubsystemBase {
                     Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
 
                     if (Robot.isBlue()) {
-                        Field.FIELD2D.getObject("path").setPoses(activePath);
+                        FieldConstants.FIELD_2D.getObject("path").setPoses(activePath);
                     } else {
-                        Field.FIELD2D.getObject("path").setPoses(Field.transformToOppositeAlliance(activePath));
+                        FieldConstants.FIELD_2D.getObject("path").setPoses(FieldConstants.transformToOppositeAlliance(activePath));
                     }
                 });
         PathPlannerLogging.setLogTargetPoseCallback(
@@ -206,7 +207,7 @@ public class Swerve extends SubsystemBase {
                 Logger.recordOutput(value.getFirst(), value.getSecond());
 
                 List<Pose2d> poses = Arrays.stream(value.getSecond()).map(t -> new Pose2d(t, new Rotation2d())).toList();
-                Field.FIELD2D.getObject(value.getFirst()).setPoses(poses);
+                FieldConstants.FIELD_2D.getObject(value.getFirst()).setPoses(poses);
             });
 
         // Configure SysId
@@ -243,7 +244,7 @@ public class Swerve extends SubsystemBase {
             Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
         }
 
-        Logger.recordOutput("Swerve/DistanceFromHub", getPose().getTranslation().getDistance(Field.getHubPose().getTranslation()));
+        Logger.recordOutput("Swerve/DistanceFromHub", getPose().getTranslation().getDistance(FieldConstants.getHubPose().getTranslation()));
 
         // Update odometry
         double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
@@ -276,9 +277,9 @@ public class Swerve extends SubsystemBase {
         }
 
         // Update gyro alert
-        gyroDisconnectedAlert.set(!gyroInputs.connected && Settings.CURRENT_MODE != Mode.SIM);
+        gyroDisconnectedAlert.set(!gyroInputs.connected && GlobalSettings.CURRENT_MODE != Mode.SIM);
 
-        Field.FIELD2D.getRobotObject().setPose(getPose());
+        FieldConstants.FIELD_2D.getRobotObject().setPose(getPose());
     }
 
     /**
@@ -287,7 +288,7 @@ public class Swerve extends SubsystemBase {
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
-        if (!Settings.EnabledSubsystems.SWERVE.get()) {
+        if (!GlobalSettings.EnabledSubsystems.SWERVE.get()) {
             for (var module : modules) {
                 module.stop();
             }

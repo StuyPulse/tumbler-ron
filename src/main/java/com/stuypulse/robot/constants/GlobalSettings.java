@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * values that we can edit on whatever dashboard we
  * are using.
  */
-public interface Settings {
+public interface GlobalSettings {
 
     Time DT = Milliseconds.of(20);
 
@@ -48,30 +48,5 @@ public interface Settings {
 
     public interface EnabledSubsystems {
         LoggedNetworkBoolean SWERVE = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Swerve", true);
-    }
-
-    public interface Driver {
-
-        double BUZZ_TIME = 1.0;
-
-        double BUZZ_INTENSITY = 1.0;
-
-        public interface Drive {
-
-            double DEADBAND = 0.05;
-
-            double RC = 0.05;
-
-            double POWER = 2.0;
-        }
-
-        public interface Turn {
-
-            double DEADBAND = 0.07;
-
-            double RC = 0.05;
-
-            double POWER = 2.0;
-        }
     }
 }

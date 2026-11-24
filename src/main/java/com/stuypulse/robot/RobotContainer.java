@@ -6,8 +6,8 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
-import com.stuypulse.robot.constants.Field;
-import com.stuypulse.robot.constants.Ports;
+import com.stuypulse.robot.constants.DriverConstants;
+import com.stuypulse.robot.constants.FieldConstants;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
 
     // Gamepads
-    public final CommandXboxController driver = new CommandXboxController(Ports.Gamepad.DRIVER);
+    public final CommandXboxController driver = new CommandXboxController(DriverConstants.Driver.DRIVER_INDEX);
 
     // Subsystem
     private final Swerve swerve = Swerve.getInstance();
@@ -41,7 +41,7 @@ public class RobotContainer {
         configureDefaultCommands();
         configureButtonBindings();
         configureAutons();
-        SmartDashboard.putData("Field", Field.FIELD2D);
+        SmartDashboard.putData("Field", FieldConstants.FIELD_2D);
 
         // COMMENT OUT BEFORE MATCHES
         configureSysID();

@@ -5,15 +5,19 @@
 /***************************************************************/
 package com.stuypulse.robot.commands.swerve;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.stuypulse.robot.Robot;
-import com.stuypulse.robot.constants.Settings.Driver.Drive;
-import com.stuypulse.robot.constants.Settings.Driver.Turn;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveSettings;
+
+import com.stuypulse.robot.constants.DriverConstants.DriveConstraints;
+import com.stuypulse.robot.constants.DriverConstants.Driver.Drive;
+import com.stuypulse.robot.constants.DriverConstants.Driver.Turn;
+
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-import com.stuypulse.robot.util.swerve.swerveinput.DriveInputProcessor;
-import com.stuypulse.robot.util.swerve.swerveinput.DriveTurnInputProcessor;
+import com.stuypulse.robot.util.swerve.DriveInputProcessor;
+import com.stuypulse.robot.util.swerve.DriveTurnInputProcessor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,8 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class SwerveDriveDrive extends Command {
 
     private final Swerve swerve;
-
-    private final CommandXboxController driver;
 
     private final DriveInputProcessor speed;
 
@@ -36,15 +38,14 @@ public class SwerveDriveDrive extends Command {
                 driver,
                 Drive.DEADBAND,
                 Drive.POWER,
-                SwerveSettings.Constraints.MAX_VELOCITY_M_PER_S,
-                SwerveSettings.Constraints.MAX_ACCEL_M_PER_S_SQUARED,
+                DriveConstraints.MAX_VELOCITY,
+                DriveConstraints.MAX_ACCEL,
                 Drive.RC);
         turn = new DriveTurnInputProcessor(
                 driver,
                 Turn.DEADBAND,
                 Turn.POWER,
-                SwerveSettings.Constraints.MAX_ANGULAR_VEL_RAD_PER_S, Turn.RC);
-        this.driver = driver;
+                DriveConstraints.MAX_ANGULAR_VEL, Turn.RC);
         addRequirements(swerve);
     }
 
@@ -57,7 +58,7 @@ public class SwerveDriveDrive extends Command {
         speed.update();
         turn.update();
 
-        ChassisSpeeds speeds = new ChassisSpeeds(speed.get().getX(), speed.get().getY(), -turn.get());
+        ChassisSpeeds speeds = new ChassisSpeeds(speed.get().getX(), speed.get().getY(), -turn.get().in(RadiansPerSecond));
 
         boolean isFlipped = !Robot.isBlue();
 

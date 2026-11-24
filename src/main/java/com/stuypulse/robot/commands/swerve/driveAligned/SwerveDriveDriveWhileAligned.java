@@ -9,11 +9,12 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.stuypulse.robot.constants.Settings.Driver.Drive;
+import com.stuypulse.robot.constants.DriverConstants.DriveConstraints;
+import com.stuypulse.robot.constants.DriverConstants.Driver.Drive;
+
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
-import com.stuypulse.robot.util.swerve.swerveinput.DriveInputProcessor;
+import com.stuypulse.robot.util.swerve.DriveInputProcessor;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,8 +27,6 @@ public class SwerveDriveDriveWhileAligned extends Command {
 
     protected static final Swerve swerve;
 
-    private final CommandXboxController driver;
-
     private final DriveInputProcessor speed;
 
     private final Supplier<Pose2d> targetPose;
@@ -36,15 +35,14 @@ public class SwerveDriveDriveWhileAligned extends Command {
 
     public SwerveDriveDriveWhileAligned(CommandXboxController driver, Supplier<Pose2d> targetPose) {
         this.speed = new DriveInputProcessor(
-                driver, 
-                Drive.DEADBAND, 
-                Drive.POWER, 
-                SwerveConstants.SwerveSettings.Constraints.MAX_VELOCITY_M_PER_S, 
-                SwerveConstants.SwerveSettings.Constraints.MAX_ACCEL_M_PER_S_SQUARED, 
+                driver,
+                Drive.DEADBAND,
+                Drive.POWER,
+                DriveConstraints.MAX_VELOCITY,
+                DriveConstraints.MAX_ACCEL,
                 Drive.RC);
-        this.driver = driver;
         this.targetPose = targetPose;
-        this.headingController = new PIDController(SwerveGains.Alignment.akP, SwerveGains.Alignment.akI, SwerveGains.Alignment.akD);
+        this.headingController = new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
         headingController.enableContinuousInput(-Math.PI, Math.PI);
         addRequirements(swerve);
     }

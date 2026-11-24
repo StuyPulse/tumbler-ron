@@ -7,12 +7,14 @@ package com.stuypulse.robot.commands.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.stuypulse.robot.constants.DriverConstants.DriveConstraints;
+import com.stuypulse.robot.constants.DriverConstants.Driver.Drive;
+import com.stuypulse.robot.util.swerve.DriveInputProcessor;
+
 import com.stuypulse.robot.Robot;
-import com.stuypulse.robot.constants.Settings.Driver.Drive;
+
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveSettings;
-import com.stuypulse.robot.util.swerve.swerveinput.DriveInputProcessor;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,8 +29,6 @@ public class SwerveDriveRotate extends Command {
 
     private Rotation2d rotation;
 
-    private CommandXboxController driver;
-
     private final DriveInputProcessor speed;
 
     private final PIDController headingController;
@@ -36,20 +36,19 @@ public class SwerveDriveRotate extends Command {
     public SwerveDriveRotate(CommandXboxController driver, Rotation2d rotation) {
         this.swerve = Swerve.getInstance();
         this.rotation = rotation;
-        this.driver = driver;
         this.speed = new DriveInputProcessor(
                 driver,
                 Drive.DEADBAND,
                 Drive.POWER,
-                SwerveSettings.Constraints.MAX_VELOCITY_M_PER_S,
-                SwerveSettings.Constraints.MAX_ACCEL_M_PER_S_SQUARED,
+                DriveConstraints.MAX_VELOCITY,
+                DriveConstraints.MAX_ACCEL,
                 Drive.RC);
         addRequirements(swerve);
 
         headingController = new PIDController(
-                SwerveGains.Alignment.akP,
-                SwerveGains.Alignment.akI,
-                SwerveGains.Alignment.akD);
+                SwerveGains.akP,
+                SwerveGains.akI,
+                SwerveGains.akD);
         headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 

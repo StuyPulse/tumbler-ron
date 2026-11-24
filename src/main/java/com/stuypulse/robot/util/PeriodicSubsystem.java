@@ -14,15 +14,15 @@ import java.util.List;
  * A standard subsystem that includes an extra periodic callback which runs after the command
  * scheduler. Allows outputs to be published after all other periodic code has finished.
  */
-public abstract class FullSubsystem extends SubsystemBase {
-    private static List<FullSubsystem> instances = new ArrayList<>();
+public abstract class PeriodicSubsystem extends SubsystemBase {
+    private static List<PeriodicSubsystem> instances = new ArrayList<>();
 
-    public FullSubsystem() {
+    public PeriodicSubsystem() {
         super();
         instances.add(this);
     }
 
-    public FullSubsystem(String name) {
+    public PeriodicSubsystem(String name) {
         super(name);
         instances.add(this);
     }
@@ -35,7 +35,7 @@ public abstract class FullSubsystem extends SubsystemBase {
 
     /** Run the "after periodic" methods for all subsystems. */
     public static void runAllPeriodicAfterScheduler() {
-        for (FullSubsystem instance : instances) {
+        for (PeriodicSubsystem instance : instances) {
             instance.periodicAfterScheduler();
         }
     }

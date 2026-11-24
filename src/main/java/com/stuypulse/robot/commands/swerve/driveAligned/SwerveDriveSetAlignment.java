@@ -13,9 +13,10 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
+
+import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveTolerances;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
-import com.stuypulse.robot.util.swerve.AlignmentUtil;
+
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -24,7 +25,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import com.stuypulse.robot.Robot;
 
 public class SwerveDriveSetAlignment extends Command {
 
@@ -39,10 +39,10 @@ public class SwerveDriveSetAlignment extends Command {
 
     protected SwerveDriveSetAlignment(Supplier<Pose2d> pose) {
         this.isAligned = () -> Math.abs(swerve.getPose().getRotation().minus(getTargetAngle())
-                .getDegrees()) < SwerveConstants.SwerveSettings.Alignment.Tolerances.THETA_TOLERANCE.getDegrees();
-        this.alignmentDebouncer = new Debouncer(SwerveConstants.SwerveSettings.Alignment.Tolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
+                .getDegrees()) < SwerveTolerances.THETA_TOLERANCE.getDegrees();
+        this.alignmentDebouncer = new Debouncer(SwerveTolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
         this.pose = pose;
-        this.headingController = new PIDController(SwerveGains.Alignment.akP, SwerveGains.Alignment.akI, SwerveGains.Alignment.akD);
+        this.headingController = new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
         this.headingController.enableContinuousInput(-Math.PI, Math.PI);
         addRequirements(swerve);
     }
@@ -52,7 +52,8 @@ public class SwerveDriveSetAlignment extends Command {
     }
 
     public Rotation2d getTargetAngle() {
-        return AlignmentUtil.getTargetAlignmentAngle(swerve.getPose(), pose.get());
+        double atan = Math.atan2(pose.get().getY() - swerve.getPose().getY(), pose.get().getX() - swerve.getPose().getX());
+        return new Rotation2d(atan);
     }
 
     @Override

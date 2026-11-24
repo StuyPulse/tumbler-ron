@@ -5,11 +5,11 @@
 /***************************************************************/
 package com.stuypulse.robot.commands.swerve.driveAligned;
 
-import com.stuypulse.robot.constants.Field;
+import com.stuypulse.robot.constants.FieldConstants;
 
 public class SwerveDriveAlignToHub extends SwerveDriveSetAlignment {
 
     public SwerveDriveAlignToHub() {
-        super(Field::getHubPose);
+        super(FieldConstants::getHubPose);
     }
 }

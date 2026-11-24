@@ -1,8 +1,12 @@
-package com.stuypulse.robot.util.simulation.TalonFXSimulation;
+/************************ PROJECT ZIXI ************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
+package com.stuypulse.robot.util.talonfx.sim;
 
 import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.units.measure.*;
+
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -15,9 +19,6 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
  *
  * <p>This interface defines the contract for a system simulation, which can be used to abstract the
  * behavior of all WPILib linear system sims in one interface.
- *
- * @see TalonFXSimulation
- * @author Faizaan (https://github.com/Faizaan-J)
  */
 public interface SystemSim<T> {
     /**
@@ -86,7 +87,7 @@ public interface SystemSim<T> {
 
     static SystemSim<FlywheelSim> of(FlywheelSim flywheelSim) {
         return new SystemSim<FlywheelSim>() {
-            private Angle position = Rotations.of(0);
+            private Angle position = Rotations.zero();
 
             @Override
             public void setInputVoltage(Voltage voltage) {
@@ -164,8 +165,7 @@ public interface SystemSim<T> {
 
             @Override
             public AngularVelocity getMechanismVelocity() {
-                return RadiansPerSecond.of(
-                        elevatorSim.getVelocityMetersPerSecond() / drumRadius.in(Meters));
+                return RadiansPerSecond.of(elevatorSim.getVelocityMetersPerSecond() / drumRadius.in(Meters));
             }
 
             @Override

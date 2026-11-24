@@ -30,8 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /** This interface stores information about the field elements. */
-public interface Field {
-        public static final Field2d FIELD2D = new Field2d();
+public interface FieldConstants {
+        public static final Field2d FIELD_2D = new Field2d();
 
         double WIDTH = Units.inchesToMeters(317.000);
 
@@ -576,7 +576,7 @@ public interface Field {
         }
 
         public static Pose2d[] transformToOppositeAlliance(Pose2d[] poses) {
-                return Arrays.stream(poses).map(Field::transformToOppositeAlliance).toArray(Pose2d[]::new);
+                return Arrays.stream(poses).map(FieldConstants::transformToOppositeAlliance).toArray(Pose2d[]::new);
         }
 
         /** * EMPTY FIELD POSES *** */

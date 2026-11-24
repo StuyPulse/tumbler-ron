@@ -1,16 +1,18 @@
-/************************* PROJECT RON *************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
-/* Use of this source code is governed by an MIT-style license */
-/* that can be found in the repository LICENSE file.           */
-/***************************************************************/
-package com.stuypulse.robot.util.simulation.TalonFXSimulation;
+/************************ PROJECT ZIXI ************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
+package com.stuypulse.robot.util.talonfx.sim;
 
+import com.stuypulse.robot.util.talonfx.config.TalonFXConfig;
+import com.stuypulse.robot.util.talonfx.logged.LoggedTalonFX;
+
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.units.measure.*;
+
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import com.stuypulse.robot.constants.Motors.TalonFXConfig;
-import com.stuypulse.robot.util.logged.LoggedTalonFX.LoggedTalonFX;
-import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj.RobotController;
 
 /**
  *
@@ -21,9 +23,6 @@ import edu.wpi.first.wpilibj.RobotController;
  * behavior of a CTRE motor controller by using WPILib's linear system simulation classes. This
  * class is designed to be used in a conjunction with a SystemSim instance that abstracts all types
  * of WPILib linear sims.
- *
- * @see SystemSim
- * @author Faizaan (https://github.com/Faizaan-J)
  */
 public class TalonFXSimulation extends LoggedTalonFX {
     private final SystemSim<?> simMotor;
@@ -37,7 +36,7 @@ public class TalonFXSimulation extends LoggedTalonFX {
      * @param adapter The simulation adapter for the motor.
      */
     public TalonFXSimulation(int port, double gearRatio, SystemSim<?> adapter) {
-        super(port);
+        super(port, new CANBus("simulation"));
         this.gearRatio = gearRatio;
         this.simMotor = adapter;
     }
@@ -54,7 +53,7 @@ public class TalonFXSimulation extends LoggedTalonFX {
     /**
      * Call once AFTER configuring the motors to link the orientation of this motor to a reference
      * motor. This ensures that the gear ratio is correctly oriented for the simulation.
-     *`
+     *
      * @param reference The reference motor to compensate for orientation. This should be the
      *     "leader" motor usually.
      */
