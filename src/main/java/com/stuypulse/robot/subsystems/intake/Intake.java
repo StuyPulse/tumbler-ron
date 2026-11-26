@@ -1,5 +1,6 @@
 package com.stuypulse.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.stuypulse.robot.constants.GlobalSettings;
@@ -30,6 +31,7 @@ public class Intake extends PeriodicSubsystem {
     private IntakeIO io;
     private IntakeIOInputsAutoLogged inputs;
     private IntakeIOOutputs outputs;
+    @AutoLogOutput(key = "Intake/State")
     private IntakeState state;
 
     public enum IntakeState {
@@ -80,14 +82,14 @@ public class Intake extends PeriodicSubsystem {
     }
 
     public Command stop() {
-        return runOnce(() -> setState(IntakeState.STOP));
+        return run(() -> setState(IntakeState.STOP));
     }
 
     public Command intake() {
-        return runOnce(() -> setState(IntakeState.INTAKE));
+        return run(() -> setState(IntakeState.INTAKE));
     }
 
     public Command outtake() {
-        return runOnce(() -> setState(IntakeState.OUTTAKE));
+        return run(() -> setState(IntakeState.OUTTAKE));
     }
 }
