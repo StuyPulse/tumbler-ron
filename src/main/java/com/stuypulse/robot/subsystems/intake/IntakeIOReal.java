@@ -6,7 +6,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
@@ -27,11 +27,11 @@ public class IntakeIOReal implements IntakeIO {
     private Debouncer leaderConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
     private Debouncer followerConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
 
-    private Supplier<Double> statorCurrent;
-    private Supplier<Double> supplyCurrent;
-    private Supplier<Double> temperature;
-    private Supplier<Double> appliedVoltage;
-    private Supplier<Double> velocity;
+    private DoubleSupplier statorCurrent;
+    private DoubleSupplier supplyCurrent;
+    private DoubleSupplier temperature;
+    private DoubleSupplier appliedVoltage;
+    private DoubleSupplier velocity;
 
     public IntakeIOReal() {
         this.rollerMotorLeader = new SparkFlex(IntakeMotorIds.LEADER_MOTOR, MotorType.kBrushless);
@@ -41,7 +41,7 @@ public class IntakeIOReal implements IntakeIO {
         rollerMotorFollower.configure(IntakeMotorConfig.followerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         this.statorCurrent = () -> rollerMotorLeader.getOutputCurrent();
-        this.supplyCurrent = () -> statorCurrent.get() * Math.abs(rollerMotorLeader.getAppliedOutput());
+        this.supplyCurrent = () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
         this.temperature = () -> rollerMotorLeader.getMotorTemperature();
         this.appliedVoltage = () -> rollerMotorLeader.getBusVoltage();
         this.velocity = () -> rollerMotorLeader.getEncoder().getVelocity();
@@ -49,11 +49,11 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.statorCurrent = Amps.of(statorCurrent.get());
-        inputs.supplyCurrent = Amps.of(supplyCurrent.get());
-        inputs.temperature = Celsius.of(temperature.get());
-        inputs.appliedVoltage = Volts.of(appliedVoltage.get());
-        inputs.velocity = RPM.of(velocity.get());
+        inputs.statorCurrent = Amps.of(statorCurrent.getAsDouble());
+        inputs.supplyCurrent = Amps.of(supplyCurrent.getAsDouble());
+        inputs.temperature = Celsius.of(temperature.getAsDouble());
+        inputs.appliedVoltage = Volts.of(appliedVoltage.getAsDouble());
+        inputs.velocity = RPM.of(velocity.getAsDouble());
 
         inputs.leaderConnected = leaderConnectedDebouncer.calculate(rollerMotorLeader.getLastError() == REVLibError.kOk);
         inputs.followerConnected = followerConnectedDebouncer.calculate(rollerMotorFollower.getLastError() == REVLibError.kOk);
