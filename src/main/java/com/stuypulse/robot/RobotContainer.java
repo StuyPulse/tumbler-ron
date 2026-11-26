@@ -10,7 +10,11 @@ import com.stuypulse.robot.commands.auton.AutonFactory;
 import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.DriverConstants;
 import com.stuypulse.robot.constants.FieldConstants;
+import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.subsystems.intake.Intake;
+import com.stuypulse.robot.subsystems.intake.IntakeIO;
+import com.stuypulse.robot.subsystems.intake.IntakeIOReal;
+import com.stuypulse.robot.subsystems.intake.IntakeIOSim;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,7 +44,7 @@ public class RobotContainer {
 
     // Subsystem
     private final Swerve swerve = Swerve.getInstance();
-    private final Intake intake = Intake.getInstance();
+    private final Intake intake;
 
     // Autons
     private final LoggedDashboardChooser<Auton> autonChooser =
@@ -50,7 +54,18 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        // swerve.configureAutoBuilder(); // done in swerve constructor
+        switch (GlobalSettings.CURRENT_MODE) {
+            case REAL -> {
+                intake = new Intake(new IntakeIOReal());
+            }
+            case SIM -> {
+                intake = new Intake(new IntakeIOSim());
+            }
+            default -> {
+                intake = new Intake(new IntakeIO() {});
+            }
+        }
+
         configureDefaultCommands();
         configureButtonBindings();
         configureAutons();

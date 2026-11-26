@@ -16,20 +16,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends PeriodicSubsystem {
-    private static final Intake instance;
-
-    static {
-        switch (GlobalSettings.CURRENT_MODE) {
-            case REAL -> instance = new Intake(new IntakeIOReal());
-            case SIM -> instance = new Intake(new IntakeIOSim());
-            default -> instance = new Intake(new IntakeIO() {});
-        }
-    }
-
-    public static Intake getInstance() {
-        return instance;
-    }
-
     private IntakeIO io;
     private IntakeIOInputsAutoLogged inputs;
     private IntakeIOOutputs outputs;
