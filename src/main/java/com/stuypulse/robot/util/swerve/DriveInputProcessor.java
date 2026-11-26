@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.stuypulse.robot.constants.DriverConstants.DriveConstraints;
+import com.stuypulse.robot.constants.DriverConstants.Driver.Drive;
 import com.stuypulse.robot.constants.GlobalSettings;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -95,6 +97,23 @@ public class DriveInputProcessor {
         this.yLowPassFilter = LinearFilter.singlePoleIIR(rc, GlobalSettings.DT.in(Seconds));
 
         this.processedSpeed = Translation2d.kZero;
+    }
+
+    /**
+     * Gets the default DriveInputProcessor based on settings from DriverConstants ({@link
+     * com.stuypulse.robot.constants.DriverConstants.Driver})
+     *
+     * @param controller Controller to read inputs from
+     * @return a DriveInputProcessor with default settings
+     */
+    public static DriveInputProcessor getDefaultProcessor(CommandXboxController controller) {
+        return new DriveInputProcessor(
+                controller,
+                Drive.DEADBAND,
+                Drive.POWER,
+                DriveConstraints.MAX_VELOCITY,
+                DriveConstraints.MAX_ACCEL,
+                Drive.RC);
     }
 
     /**

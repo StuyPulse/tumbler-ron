@@ -24,7 +24,6 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutTemperature;
 import edu.wpi.first.units.measure.MutVoltage;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -63,11 +62,19 @@ public class IntakeIOReal implements IntakeIO {
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        this.leaderConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
-        this.followerConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
+        this.leaderConnectedDebouncer =
+                new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
+        this.followerConnectedDebouncer =
+                new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
 
-        this.leaderConnected = () -> leaderConnectedDebouncer.calculate(rollerMotorLeader.getLastError() == REVLibError.kOk);
-        this.followerConnected = () -> followerConnectedDebouncer.calculate(rollerMotorFollower.getLastError() == REVLibError.kOk);
+        this.leaderConnected =
+                () ->
+                        leaderConnectedDebouncer.calculate(
+                                rollerMotorLeader.getLastError() == REVLibError.kOk);
+        this.followerConnected =
+                () ->
+                        followerConnectedDebouncer.calculate(
+                                rollerMotorFollower.getLastError() == REVLibError.kOk);
         this.statorCurrent = () -> rollerMotorLeader.getOutputCurrent();
         this.supplyCurrent =
                 () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());

@@ -7,6 +7,8 @@ package com.stuypulse.robot.util.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.stuypulse.robot.constants.DriverConstants.DriveConstraints;
+import com.stuypulse.robot.constants.DriverConstants.Driver.Turn;
 import com.stuypulse.robot.constants.GlobalSettings;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -79,6 +81,18 @@ public class DriveTurnInputProcessor {
         this.lowPassFilter = LinearFilter.singlePoleIIR(rc, GlobalSettings.DT.in(Seconds));
 
         this.processedAngularVelocity = 0;
+    }
+
+    /**
+     * Gets the default DriveInputProcessor based on settings from DriverConstants ({@link
+     * com.stuypulse.robot.constants.DriverConstants.Driver})
+     *
+     * @param controller Controller to read inputs from
+     * @return a DriveInputProcessor with default settings
+     */
+    public static DriveTurnInputProcessor getDefaultProcessor(CommandXboxController controller) {
+        return new DriveTurnInputProcessor(
+                controller, Turn.DEADBAND, Turn.POWER, DriveConstraints.MAX_ANGULAR_VEL, Turn.RC);
     }
 
     /**

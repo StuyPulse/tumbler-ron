@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.stuypulse.robot.Robot;
-import com.stuypulse.robot.subsystems.swerve.Swerve;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -77,8 +77,8 @@ public interface FieldConstants {
     public static final Pose2d allianceZone =
             new Pose2d(Units.inchesToMeters(182.11), WIDTH, new Rotation2d());
 
-    public static boolean inAllianceZone() {
-        return Swerve.getInstance().getPose().getX() < allianceZone.getX();
+    public static boolean inAllianceZone(Translation2d robot) {
+        return robot.getX() < allianceZone.getX();
     }
 
     public static record AprilTag(int id, Pose3d location) {}

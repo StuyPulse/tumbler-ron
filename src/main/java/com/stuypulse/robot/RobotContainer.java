@@ -7,19 +7,25 @@ package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.Auton;
 import com.stuypulse.robot.commands.auton.AutonFactory;
-import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.DriverConstants;
 import com.stuypulse.robot.constants.FieldConstants;
+import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.subsystems.intake.Intake;
+import com.stuypulse.robot.subsystems.intake.IntakeIO;
+import com.stuypulse.robot.subsystems.intake.IntakeIOReal;
+import com.stuypulse.robot.subsystems.intake.IntakeIOSim;
+import com.stuypulse.robot.subsystems.swerve.GyroIO;
+import com.stuypulse.robot.subsystems.swerve.GyroIOReal;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOReal;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOSim;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
+import com.stuypulse.robot.subsystems.swerve.TunerConstants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
 import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -39,8 +45,8 @@ public class RobotContainer {
             new CommandXboxController(DriverConstants.Driver.DRIVER_INDEX);
 
     // Subsystem
-    private final Swerve swerve = Swerve.getInstance();
-    private final Intake intake = Intake.getInstance();
+    private final Swerve swerve;
+    private final Intake intake;
 
     // Autons
     private final LoggedDashboardChooser<Auton> autonChooser =
@@ -50,7 +56,39 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        // swerve.configureAutoBuilder(); // done in swerve constructor
+        switch (GlobalSettings.CURRENT_MODE) {
+            case REAL -> {
+                swerve = new Swerve(
+                    new GyroIOReal(),
+                    new ModuleIOReal(TunerConstants.FrontLeft),
+                    new ModuleIOReal(TunerConstants.FrontRight),
+                    new ModuleIOReal(TunerConstants.BackLeft),
+                    new ModuleIOReal(TunerConstants.BackRight)
+                );
+                intake = new Intake(new IntakeIOReal());
+            }
+            case SIM -> {
+                swerve = new Swerve(
+                    new GyroIO() {}, 
+                    new ModuleIOSim(TunerConstants.FrontLeft),
+                    new ModuleIOSim(TunerConstants.FrontRight),
+                    new ModuleIOSim(TunerConstants.BackLeft),
+                    new ModuleIOSim(TunerConstants.BackRight)
+                );
+                intake = new Intake(new IntakeIOSim());
+            }
+            default -> {
+                swerve = new Swerve(
+                    new GyroIOReal(),
+                    new ModuleIOReal(TunerConstants.FrontLeft),
+                    new ModuleIOReal(TunerConstants.FrontRight),
+                    new ModuleIOReal(TunerConstants.BackLeft),
+                    new ModuleIOReal(TunerConstants.BackRight)
+                );
+                intake = new Intake(new IntakeIO() {});
+            }
+        }
+
         configureDefaultCommands();
         configureButtonBindings();
         configureAutons();
@@ -64,7 +102,7 @@ public class RobotContainer {
     /** DEFAULTS ** */
     /** ************ */
     private void configureDefaultCommands() {
-        swerve.setDefaultCommand(new SwerveDriveDrive(driver));
+        swerve.setDefaultCommand(swerve.joystickDrive(driver));
         intake.setDefaultCommand(intake.stop());
     }
 
