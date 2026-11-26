@@ -1,3 +1,8 @@
+/************************* PROJECT RON *************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
+/* Use of this source code is governed by an MIT-style license */
+/* that can be found in the repository LICENSE file.           */
+/***************************************************************/
 package com.stuypulse.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Amps;
@@ -9,9 +14,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Energy;
@@ -42,13 +46,15 @@ public interface IntakeConstants {
     }
 
     public interface IntakeMotorConfig {
-        SparkBaseConfig leaderMotorConfig = new SparkFlexConfig()
-            .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit((int) IntakeSettings.CURRENT_LIMIT.in(Amps));
+        SparkBaseConfig leaderMotorConfig =
+                new SparkFlexConfig()
+                        .idleMode(IdleMode.kCoast)
+                        .smartCurrentLimit((int) IntakeSettings.CURRENT_LIMIT.in(Amps));
 
-        SparkBaseConfig followerMotorConfig = new SparkFlexConfig()
-            .apply(IntakeMotorConfig.leaderMotorConfig)
-            .follow(IntakeMotorIds.LEADER_MOTOR);
+        SparkBaseConfig followerMotorConfig =
+                new SparkFlexConfig()
+                        .apply(IntakeMotorConfig.leaderMotorConfig)
+                        .follow(IntakeMotorIds.LEADER_MOTOR);
     }
 
     public interface IntakeMotorIds {

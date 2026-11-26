@@ -1,13 +1,13 @@
-/************************ PROJECT ZIXI ************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
-/* This work is licensed under the terms of the MIT license.  */
-/**************************************************************/
+/************************* PROJECT RON *************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
+/* Use of this source code is governed by an MIT-style license */
+/* that can be found in the repository LICENSE file.           */
+/***************************************************************/
 package com.stuypulse.robot.util.talonfx.logged;
 
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

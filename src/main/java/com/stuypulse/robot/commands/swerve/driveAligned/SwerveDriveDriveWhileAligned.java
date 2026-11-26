@@ -5,23 +5,19 @@
 /***************************************************************/
 package com.stuypulse.robot.commands.swerve.driveAligned;
 
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.stuypulse.robot.constants.DriverConstants.DriveConstraints;
 import com.stuypulse.robot.constants.DriverConstants.Driver.Drive;
-
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
 import com.stuypulse.robot.util.swerve.DriveInputProcessor;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class SwerveDriveDriveWhileAligned extends Command {
 
@@ -34,15 +30,17 @@ public class SwerveDriveDriveWhileAligned extends Command {
     private final PIDController headingController;
 
     public SwerveDriveDriveWhileAligned(CommandXboxController driver, Supplier<Pose2d> targetPose) {
-        this.speed = new DriveInputProcessor(
-                driver,
-                Drive.DEADBAND,
-                Drive.POWER,
-                DriveConstraints.MAX_VELOCITY,
-                DriveConstraints.MAX_ACCEL,
-                Drive.RC);
+        this.speed =
+                new DriveInputProcessor(
+                        driver,
+                        Drive.DEADBAND,
+                        Drive.POWER,
+                        DriveConstraints.MAX_VELOCITY,
+                        DriveConstraints.MAX_ACCEL,
+                        Drive.RC);
         this.targetPose = targetPose;
-        this.headingController = new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
+        this.headingController =
+                new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
         headingController.enableContinuousInput(-Math.PI, Math.PI);
         addRequirements(swerve);
     }
@@ -53,9 +51,10 @@ public class SwerveDriveDriveWhileAligned extends Command {
 
     public Rotation2d getTargetAngle() {
         Pose2d currentPose = swerve.getPose();
-        double atan = Math.atan2(
-                targetPose.get().getY() - currentPose.getY(),
-                targetPose.get().getX() - currentPose.getX());
+        double atan =
+                Math.atan2(
+                        targetPose.get().getY() - currentPose.getY(),
+                        targetPose.get().getX() - currentPose.getX());
         return new Rotation2d(atan);
     }
 
@@ -63,9 +62,10 @@ public class SwerveDriveDriveWhileAligned extends Command {
     public void execute() {
         speed.update();
 
-        double omega = headingController.calculate(
-                swerve.getRotation().getRadians(),
-                getTargetAngle().getRadians()); // rotation.get?
+        double omega =
+                headingController.calculate(
+                        swerve.getRotation().getRadians(),
+                        getTargetAngle().getRadians()); // rotation.get?
 
         ChassisSpeeds speeds = new ChassisSpeeds(speed.get().getX(), speed.get().getY(), omega);
         swerve.runVelocity(speeds);

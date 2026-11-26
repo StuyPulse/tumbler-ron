@@ -13,6 +13,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class SwerveDriveResetRotation extends InstantCommand {
 
     public SwerveDriveResetRotation() {
-        super(() -> Swerve.getInstance().resetHeading(Robot.isBlue() ? Rotation2d.kZero : Rotation2d.k180deg));
+        super(
+                () ->
+                        Swerve.getInstance()
+                                .resetHeading(
+                                        Robot.isBlue() ? Rotation2d.kZero : Rotation2d.k180deg));
     }
 }

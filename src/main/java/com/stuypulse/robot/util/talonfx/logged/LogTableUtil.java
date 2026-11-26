@@ -1,14 +1,14 @@
-/************************ PROJECT ZIXI ************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
-/* This work is licensed under the terms of the MIT license.  */
-/**************************************************************/
+/************************* PROJECT RON *************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
+/* Use of this source code is governed by an MIT-style license */
+/* that can be found in the repository LICENSE file.           */
+/***************************************************************/
 package com.stuypulse.robot.util.talonfx.logged;
 
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.util.WPISerializable;
 import edu.wpi.first.util.struct.StructSerializable;
-
+import edu.wpi.first.wpilibj.util.Color;
 import java.util.Arrays;
 import java.util.Objects;
 import org.littletonrobotics.junction.LogTable;
@@ -175,8 +175,7 @@ public final class LogTableUtil {
             return table.get(key, records);
         } else if (defaultArray instanceof Object[] objects) {
             return table.get(
-                    key,
-                    Arrays.stream(objects).map(String::valueOf).toArray(String[]::new));
+                    key, Arrays.stream(objects).map(String::valueOf).toArray(String[]::new));
         } else {
             return defaultArray;
         }
