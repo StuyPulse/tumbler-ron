@@ -5,15 +5,11 @@
 /***************************************************************/
 package com.stuypulse.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Joules;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Ohms;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.sim.SparkFlexSim;
 import com.stuypulse.robot.constants.GlobalSettings;
@@ -22,8 +18,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class IntakeIOSim extends IntakeIOReal {
     private SparkFlexSim rollerMotorLeader;
@@ -31,11 +25,6 @@ public class IntakeIOSim extends IntakeIOReal {
 
     private SparkFlexSim rollerMotorFollower;
     private FlywheelSim followerSim;
-
-    private DoubleSupplier statorCurrent;
-    private DoubleSupplier supplyCurrent;
-    private DoubleSupplier appliedVoltage;
-    private DoubleSupplier velocity;
 
     private double simulatedTemperatureCelsius;
 
@@ -64,12 +53,13 @@ public class IntakeIOSim extends IntakeIOReal {
 
         simulatedTemperatureCelsius = IntakeSimulation.ROOM_TEMP.in(Celsius);
 
-        this.statorCurrent = () -> rollerMotorLeader.getMotorCurrent();
-        this.supplyCurrent =
-                () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
-        this.appliedVoltage =
-                () -> rollerMotorLeader.getBusVoltage() * rollerMotorLeader.getAppliedOutput();
-        this.velocity = () -> rollerMotorLeader.getVelocity();
+        super.leaderConnected = () -> true;
+        super.followerConnected = () -> true;
+        super.statorCurrent = () -> rollerMotorLeader.getMotorCurrent();
+        super.supplyCurrent = () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
+        super.temperature = () -> simulatedTemperatureCelsius;
+        super.appliedVoltage = () -> rollerMotorLeader.getBusVoltage() * rollerMotorLeader.getAppliedOutput();
+        super.velocity = () -> rollerMotorLeader.getVelocity();
     }
 
     private void setSimulatedTemperature() {
@@ -89,9 +79,6 @@ public class IntakeIOSim extends IntakeIOReal {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.leaderConnected = true;
-        inputs.followerConnected = true;
-
         double batteryVoltage = RobotController.getBatteryVoltage();
         double DT = GlobalSettings.DT.in(Seconds);
 
@@ -107,15 +94,7 @@ public class IntakeIOSim extends IntakeIOReal {
 
         setSimulatedTemperature();
 
-        inputs.statorCurrent = Amps.of(statorCurrent.getAsDouble());
-        inputs.supplyCurrent = Amps.of(supplyCurrent.getAsDouble());
-        inputs.temperature = Celsius.of(simulatedTemperatureCelsius);
-        inputs.appliedVoltage = Volts.of(appliedVoltage.getAsDouble());
-        inputs.velocity = RPM.of(velocity.getAsDouble());
-
-        Logger.recordOutput(
-                "Intake/FollowerVelocity",
-                RPM.of(rollerMotorFollower.getVelocity()).in(RadiansPerSecond));
+        super.updateInputs(inputs);
     }
 
     @Override

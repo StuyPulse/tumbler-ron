@@ -20,22 +20,34 @@ import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakeMotorConfig;
 import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakeMotorIds;
 import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakeSettings;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutTemperature;
+import edu.wpi.first.units.measure.MutVoltage;
+
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class IntakeIOReal implements IntakeIO {
     protected SparkFlex rollerMotorLeader;
     protected SparkFlex rollerMotorFollower;
 
-    private Debouncer leaderConnectedDebouncer =
-            new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
-    private Debouncer followerConnectedDebouncer =
-            new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
+    private final Debouncer leaderConnectedDebouncer;
+    private final Debouncer followerConnectedDebouncer;
 
-    private DoubleSupplier statorCurrent;
-    private DoubleSupplier supplyCurrent;
-    private DoubleSupplier temperature;
-    private DoubleSupplier appliedVoltage;
-    private DoubleSupplier velocity;
+    private final MutCurrent mutStatorCurrent = Amps.mutable(0);
+    private final MutCurrent mutSupplyCurrent = Amps.mutable(0);
+    private final MutTemperature mutTemperature = Celsius.mutable(0);
+    private final MutVoltage mutAppliedVoltage = Volts.mutable(0);
+    private final MutAngularVelocity mutVelocity = RPM.mutable(0);
+
+    protected BooleanSupplier leaderConnected;
+    protected BooleanSupplier followerConnected;
+    protected DoubleSupplier statorCurrent;
+    protected DoubleSupplier supplyCurrent;
+    protected DoubleSupplier temperature;
+    protected DoubleSupplier appliedVoltage;
+    protected DoubleSupplier velocity;
 
     public IntakeIOReal() {
         this.rollerMotorLeader = new SparkFlex(IntakeMotorIds.LEADER_MOTOR, MotorType.kBrushless);
@@ -51,6 +63,11 @@ public class IntakeIOReal implements IntakeIO {
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
+        this.leaderConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
+        this.followerConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
+
+        this.leaderConnected = () -> leaderConnectedDebouncer.calculate(rollerMotorLeader.getLastError() == REVLibError.kOk);
+        this.followerConnected = () -> followerConnectedDebouncer.calculate(rollerMotorFollower.getLastError() == REVLibError.kOk);
         this.statorCurrent = () -> rollerMotorLeader.getOutputCurrent();
         this.supplyCurrent =
                 () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
@@ -62,29 +79,27 @@ public class IntakeIOReal implements IntakeIO {
 
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.statorCurrent = Amps.of(statorCurrent.getAsDouble());
-        inputs.supplyCurrent = Amps.of(supplyCurrent.getAsDouble());
-        inputs.temperature = Celsius.of(temperature.getAsDouble());
-        inputs.appliedVoltage = Volts.of(appliedVoltage.getAsDouble());
-        inputs.velocity = RPM.of(velocity.getAsDouble());
+        mutStatorCurrent.mut_setMagnitude(statorCurrent.getAsDouble());
+        mutSupplyCurrent.mut_setMagnitude(supplyCurrent.getAsDouble());
+        mutTemperature.mut_setMagnitude(temperature.getAsDouble());
+        mutAppliedVoltage.mut_setMagnitude(appliedVoltage.getAsDouble());
+        mutVelocity.mut_setMagnitude(velocity.getAsDouble());
 
-        inputs.leaderConnected =
-                leaderConnectedDebouncer.calculate(
-                        rollerMotorLeader.getLastError() == REVLibError.kOk);
-        inputs.followerConnected =
-                followerConnectedDebouncer.calculate(
-                        rollerMotorFollower.getLastError() == REVLibError.kOk);
+        inputs.statorCurrent = mutStatorCurrent;
+        inputs.supplyCurrent = mutSupplyCurrent;
+        inputs.temperature = mutTemperature;
+        inputs.appliedVoltage = mutAppliedVoltage;
+        inputs.velocity = mutVelocity;
+
+        inputs.leaderConnected = leaderConnected.getAsBoolean();
+        inputs.followerConnected = followerConnected.getAsBoolean();
     }
 
     @Override
     public void applyOutputs(IntakeIOOutputs outputs) {
         switch (outputs.outputMode) {
-            case STOP -> {
-                rollerMotorLeader.stopMotor();
-            }
-            case VOLTAGE -> {
-                rollerMotorLeader.setVoltage(outputs.targetVoltage);
-            }
+            case STOP -> rollerMotorLeader.stopMotor();
+            case VOLTAGE -> rollerMotorLeader.setVoltage(outputs.targetVoltage);
         }
     }
 }
