@@ -48,5 +48,6 @@ public interface GlobalSettings {
 
     public interface EnabledSubsystems {
         LoggedNetworkBoolean SWERVE = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Swerve", true);
+        LoggedNetworkBoolean INTAKE = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Intake", true);
     }
 }
