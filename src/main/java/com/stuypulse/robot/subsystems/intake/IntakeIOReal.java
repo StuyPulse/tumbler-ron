@@ -43,7 +43,7 @@ public class IntakeIOReal implements IntakeIO {
         this.statorCurrent = () -> rollerMotorLeader.getOutputCurrent();
         this.supplyCurrent = () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
         this.temperature = () -> rollerMotorLeader.getMotorTemperature();
-        this.appliedVoltage = () -> rollerMotorLeader.getBusVoltage();
+        this.appliedVoltage = () -> rollerMotorLeader.getBusVoltage() * rollerMotorLeader.getAppliedOutput();
         this.velocity = () -> rollerMotorLeader.getEncoder().getVelocity();
     }
 

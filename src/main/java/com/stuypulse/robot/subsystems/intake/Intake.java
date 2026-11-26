@@ -81,6 +81,11 @@ public class Intake extends PeriodicSubsystem {
         }
     }
 
+    @Override
+    public void periodicAfterScheduler() {
+        io.applyOutputs(outputs);
+    }
+
     public Command stop() {
         return run(() -> setState(IntakeState.STOP));
     }
