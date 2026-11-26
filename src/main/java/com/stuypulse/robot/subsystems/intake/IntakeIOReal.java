@@ -21,8 +21,8 @@ import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakeSettings;
 import edu.wpi.first.math.filter.Debouncer;
 
 public class IntakeIOReal implements IntakeIO {
-    private SparkFlex rollerMotorLeader;
-    private SparkFlex rollerMotorFollower;
+    protected SparkFlex rollerMotorLeader;
+    protected SparkFlex rollerMotorFollower;
 
     private Debouncer leaderConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
     private Debouncer followerConnectedDebouncer = new Debouncer(IntakeSettings.CONNECTED_DEBOUNCE.in(Seconds));
@@ -41,7 +41,7 @@ public class IntakeIOReal implements IntakeIO {
         rollerMotorFollower.configure(IntakeMotorConfig.followerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         this.statorCurrent = () -> rollerMotorLeader.getOutputCurrent();
-        this.supplyCurrent = () -> statorCurrent.get() * Math.abs(rollerMotorFollower.getAppliedOutput());
+        this.supplyCurrent = () -> statorCurrent.get() * Math.abs(rollerMotorLeader.getAppliedOutput());
         this.temperature = () -> rollerMotorLeader.getMotorTemperature();
         this.appliedVoltage = () -> rollerMotorLeader.getBusVoltage();
         this.velocity = () -> rollerMotorLeader.getEncoder().getVelocity();
