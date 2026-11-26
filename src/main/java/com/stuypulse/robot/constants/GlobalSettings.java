@@ -1,21 +1,16 @@
-/**
- * ********************** PROJECT RON ************************
- */
+/************************* PROJECT RON *************************/
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
 /* Use of this source code is governed by an MIT-style license */
 /* that can be found in the repository LICENSE file.           */
-/**
- * ***********************************************************
- */
+/***************************************************************/
 package com.stuypulse.robot.constants;
 
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import static edu.wpi.first.units.Units.Milliseconds;
 
 import com.ctre.phoenix6.CANBus;
-
-import static edu.wpi.first.units.Units.Milliseconds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 /*-
  * File containing tunable settings for every subsystem on the robot.
@@ -32,9 +27,11 @@ public interface GlobalSettings {
 
     CANBus CANBUS = new CANBus("rio");
 
-    Mode SIMULATION_TASK = Mode.SIM; // What to do during simulation mode. Change this to REPLAY when replaying. Change to SIM when simulating code.
+    Mode SIMULATION_TASK =
+            Mode.SIM; // What to do during simulation mode. Change this to REPLAY when
+    // replaying. Change to SIM when simulating code.
     Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIMULATION_TASK;
-    
+
     enum Mode {
         /** Running on a real robot. */
         REAL,
@@ -47,6 +44,9 @@ public interface GlobalSettings {
     }
 
     public interface EnabledSubsystems {
-        LoggedNetworkBoolean SWERVE = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Swerve", true);
+        LoggedNetworkBoolean SWERVE =
+                new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Swerve", true);
+        LoggedNetworkBoolean INTAKE =
+                new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Intake", true);
     }
 }

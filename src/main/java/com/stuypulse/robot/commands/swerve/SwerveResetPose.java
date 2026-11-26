@@ -5,11 +5,10 @@
 /***************************************************************/
 package com.stuypulse.robot.commands.swerve;
 
-import java.util.function.Supplier;
-
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import java.util.function.Supplier;
 
 public class SwerveResetPose extends InstantCommand {
     public SwerveResetPose(Pose2d newPose) {

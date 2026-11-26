@@ -1,10 +1,15 @@
 /************************* PROJECT RON *************************/
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
 /* Use of this source code is governed by an MIT-style license */
-/* that can be found in the repository LICENSE file.            */
+/* that can be found in the repository LICENSE file.           */
 /***************************************************************/
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.util.PeriodicSubsystem;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -13,26 +18,25 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.stuypulse.robot.constants.GlobalSettings;
-import com.stuypulse.robot.util.PeriodicSubsystem;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
 /**
+ *
+ *
  * <h2>Robot Class</h2>
- * 
- * This is the main class for robot code, instantiated in {@link com.stuypulse.robot.Main} It extends TimedRobot, meaning that the methods in this
- * class are called automatically during specific states of the robot.
- * 
- * This robot is structured using the <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html">CommandBased</a> framework.
+ *
+ * This is the main class for robot code, instantiated in {@link com.stuypulse.robot.Main} It
+ * extends TimedRobot, meaning that the methods in this class are called automatically during
+ * specific states of the robot.
+ *
+ * <p>This robot is structured using the <a
+ * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html">CommandBased</a>
+ * framework.
  */
 public class Robot extends LoggedRobot {
     private RobotContainer robot;
 
     /**
      * Checks the alliance the robot is on
+     *
      * @return true if the robot is on the blue alliance, false if the robot is on the red alliance
      */
     @AutoLogOutput(key = "Alliance/isBlue")
@@ -51,7 +55,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         robot = new RobotContainer();
-        
+
         switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
                 Logger.addDataReceiver(new WPILOGWriter());
@@ -74,15 +78,13 @@ public class Robot extends LoggedRobot {
 
     /**
      * This method runs when the robot connects to Driver Station.
-     * 
-     * It is used to update the robot's current alliance.
+     *
+     * <p>It is used to update the robot's current alliance.
      */
     @Override
     public void driverStationConnected() {}
 
-    /**
-     * This function is called every 20ms, regardless of the robot mode.
-     */
+    /** This function is called every 20ms, regardless of the robot mode. */
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
@@ -93,15 +95,11 @@ public class Robot extends LoggedRobot {
     /*** SIMULATION ***/
     /******************/
 
-    /**
-     * This method is called when the robot first starts in simulation mode.
-     */
+    /** This method is called when the robot first starts in simulation mode. */
     @Override
     public void simulationInit() {}
 
-    /**
-     * This method is called every 20ms during simulation mode.
-     */
+    /** This method is called every 20ms during simulation mode. */
     @Override
     public void simulationPeriodic() {}
 
@@ -109,15 +107,11 @@ public class Robot extends LoggedRobot {
     /*** DISABLED MODE ***/
     /*********************/
 
-    /**
-     * This method is called each time when the robot is disabled.
-     */
+    /** This method is called each time when the robot is disabled. */
     @Override
     public void disabledInit() {}
 
-    /**
-     * This method is called every 20ms when the robot is disabled.
-     */
+    /** This method is called every 20ms when the robot is disabled. */
     @Override
     public void disabledPeriodic() {}
 
@@ -125,21 +119,15 @@ public class Robot extends LoggedRobot {
     /*** AUTONOMOUS MODE ***/
     /***********************/
 
-    /**
-     * This method is called at the start of autonomous mode.
-     */
+    /** This method is called at the start of autonomous mode. */
     @Override
     public void autonomousInit() {}
 
-    /**
-     * This method is called every 20ms during autonomous mode.
-     */
+    /** This method is called every 20ms during autonomous mode. */
     @Override
     public void autonomousPeriodic() {}
 
-    /**
-     * This method is called when autonomous mode ends.
-     */
+    /** This method is called when autonomous mode ends. */
     @Override
     public void autonomousExit() {}
 
@@ -147,21 +135,15 @@ public class Robot extends LoggedRobot {
     /*** TELEOP MODE ***/
     /*******************/
 
-    /**
-     * This method is called at the start of teleop mode.
-     */
+    /** This method is called at the start of teleop mode. */
     @Override
     public void teleopInit() {}
 
-    /**
-     * This method is called every 20ms in teleop mode.
-     */
+    /** This method is called every 20ms in teleop mode. */
     @Override
     public void teleopPeriodic() {}
 
-    /**
-     * This method is called when teleop mode ends.
-     */
+    /** This method is called when teleop mode ends. */
     @Override
     public void teleopExit() {}
 
@@ -169,23 +151,17 @@ public class Robot extends LoggedRobot {
     /*** TEST MODE ***/
     /*****************/
 
-    /**
-     * This method is called at the start of test mode.
-     */
+    /** This method is called at the start of test mode. */
     @Override
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
     }
 
-    /**
-     * This method is called every 20ms in test mode.
-     */
+    /** This method is called every 20ms in test mode. */
     @Override
     public void testPeriodic() {}
 
-    /**
-     * This method is called when test mode ends.
-     */
+    /** This method is called when test mode ends. */
     @Override
     public void testExit() {}
 }

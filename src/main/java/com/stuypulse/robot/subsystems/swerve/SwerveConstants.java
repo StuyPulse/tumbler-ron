@@ -1,13 +1,13 @@
-/************************ PROJECT ZIXI ************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
-/* This work is licensed under the terms of the MIT license.  */
-/**************************************************************/
+/************************* PROJECT RON *************************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
+/* Use of this source code is governed by an MIT-style license */
+/* that can be found in the repository LICENSE file.           */
+/***************************************************************/
 package com.stuypulse.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.PIDConstants;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
@@ -27,10 +27,11 @@ public interface SwerveConstants {
         Distance X_TOLERANCE = Inches.of(2.0);
         Distance Y_TOLERANCE = Inches.of(2.0);
         Rotation2d THETA_TOLERANCE = Rotation2d.fromDegrees(5);
-        Pose2d POSE_TOLERANCE = new Pose2d(X_TOLERANCE.in(Meters), Y_TOLERANCE.in(Meters), THETA_TOLERANCE);
+        Pose2d POSE_TOLERANCE =
+                new Pose2d(X_TOLERANCE.in(Meters), Y_TOLERANCE.in(Meters), THETA_TOLERANCE);
         LinearVelocity MAX_VELOCITY_WHEN_ALIGNED = MetersPerSecond.of(0.15);
         Time ALIGNMENT_DEBOUNCE = Seconds.of(0.15);
-    } 
+    }
 
     public interface SwerveCharacterization {
         Time FF_START_DELAY = Seconds.of(2.0);

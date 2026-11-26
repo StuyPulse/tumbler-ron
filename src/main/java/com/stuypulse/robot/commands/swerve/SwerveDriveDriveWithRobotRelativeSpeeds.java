@@ -5,12 +5,11 @@
 /***************************************************************/
 package com.stuypulse.robot.commands.swerve;
 
+import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import com.stuypulse.robot.Robot;
 
 public class SwerveDriveDriveWithRobotRelativeSpeeds extends Command {
 
@@ -36,7 +35,8 @@ public class SwerveDriveDriveWithRobotRelativeSpeeds extends Command {
         ChassisSpeeds speeds = new ChassisSpeeds(velocityX, velocityY, -angularVelocity);
         boolean isFlipped = !Robot.isBlue();
         swerve.runVelocity(
-                ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                        speeds,
                         isFlipped
                                 ? swerve.getRotation().plus(new Rotation2d(Math.PI))
                                 : swerve.getRotation()));

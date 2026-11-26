@@ -7,17 +7,9 @@ package com.stuypulse.robot.commands.swerve.driveAligned;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveTolerances;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
-
-
+import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveTolerances;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -25,6 +17,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class SwerveDriveSetAlignment extends Command {
 
@@ -38,11 +33,19 @@ public class SwerveDriveSetAlignment extends Command {
     private Supplier<Pose2d> pose;
 
     protected SwerveDriveSetAlignment(Supplier<Pose2d> pose) {
-        this.isAligned = () -> Math.abs(swerve.getPose().getRotation().minus(getTargetAngle())
-                .getDegrees()) < SwerveTolerances.THETA_TOLERANCE.getDegrees();
-        this.alignmentDebouncer = new Debouncer(SwerveTolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
+        this.isAligned =
+                () ->
+                        Math.abs(
+                                        swerve.getPose()
+                                                .getRotation()
+                                                .minus(getTargetAngle())
+                                                .getDegrees())
+                                < SwerveTolerances.THETA_TOLERANCE.getDegrees();
+        this.alignmentDebouncer =
+                new Debouncer(SwerveTolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
         this.pose = pose;
-        this.headingController = new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
+        this.headingController =
+                new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
         this.headingController.enableContinuousInput(-Math.PI, Math.PI);
         addRequirements(swerve);
     }
@@ -52,7 +55,10 @@ public class SwerveDriveSetAlignment extends Command {
     }
 
     public Rotation2d getTargetAngle() {
-        double atan = Math.atan2(pose.get().getY() - swerve.getPose().getY(), pose.get().getX() - swerve.getPose().getX());
+        double atan =
+                Math.atan2(
+                        pose.get().getY() - swerve.getPose().getY(),
+                        pose.get().getX() - swerve.getPose().getX());
         return new Rotation2d(atan);
     }
 
@@ -65,9 +71,10 @@ public class SwerveDriveSetAlignment extends Command {
     public void execute() {
         Rotation2d targetAngle = getTargetAngle();
 
-        double omega = headingController.calculate(
-                swerve.getRotation().getRadians(),
-                targetAngle.getRadians()); // rotation.get?
+        double omega =
+                headingController.calculate(
+                        swerve.getRotation().getRadians(),
+                        targetAngle.getRadians()); // rotation.get?
 
         ChassisSpeeds speeds = new ChassisSpeeds(0, 0, omega);
         swerve.runVelocity(speeds);
