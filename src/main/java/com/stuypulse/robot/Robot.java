@@ -5,11 +5,15 @@
 /***************************************************************/
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.commands.auton.Auton;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.util.PeriodicSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import java.util.function.Consumer;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -23,21 +27,28 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  *
  * <h2>Robot Class</h2>
  *
- * This is the main class for robot code, instantiated in {@link com.stuypulse.robot.Main} It
- * extends TimedRobot, meaning that the methods in this class are called automatically during
+ * This is the main class for robot code, instantiated in
+ * {@link com.stuypulse.robot.Main} It
+ * extends TimedRobot, meaning that the methods in this class are called
+ * automatically during
  * specific states of the robot.
  *
- * <p>This robot is structured using the <a
- * href="https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html">CommandBased</a>
+ * <p>
+ * This robot is structured using the <a
+ * href=
+ * "https://docs.wpilib.org/en/stable/docs/software/commandbased/what-is-command-based.html">CommandBased</a>
  * framework.
  */
 public class Robot extends LoggedRobot {
     private RobotContainer robot;
+    private Auton auto = null;
+    private boolean wasAutonomous = false;
 
     /**
      * Checks the alliance the robot is on
      *
-     * @return true if the robot is on the blue alliance, false if the robot is on the red alliance
+     * @return true if the robot is on the blue alliance, false if the robot is on
+     *         the red alliance
      */
     @AutoLogOutput(key = "Alliance/isBlue")
     public static boolean isBlue() {
@@ -49,9 +60,9 @@ public class Robot extends LoggedRobot {
         }
     }
 
-    /** ********************* */
-    /** ROBOT SCHEDULEING ** */
-    /** ********************* */
+    /************************/
+    /*** ROBOT SCHEDULING ***/
+    /************************/
     @Override
     public void robotInit() {
         robot = new RobotContainer();
@@ -79,16 +90,29 @@ public class Robot extends LoggedRobot {
     /**
      * This method runs when the robot connects to Driver Station.
      *
-     * <p>It is used to update the robot's current alliance.
+     * <p>
+     * It is used to update the robot's current alliance.
      */
     @Override
-    public void driverStationConnected() {}
+    public void driverStationConnected() {
+    }
 
     /** This function is called every 20ms, regardless of the robot mode. */
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         PeriodicSubsystem.runAllPeriodicAfterScheduler();
+
+        boolean isAutonomous = DriverStation.isAutonomous();
+        if (isAutonomous && !wasAutonomous) {
+            autonomousSelected();
+        }
+
+        if (!isAutonomous && wasAutonomous) {
+            autonomousClosed();
+        }
+
+        wasAutonomous = isAutonomous;
     }
 
     /******************/
@@ -97,11 +121,13 @@ public class Robot extends LoggedRobot {
 
     /** This method is called when the robot first starts in simulation mode. */
     @Override
-    public void simulationInit() {}
+    public void simulationInit() {
+    }
 
     /** This method is called every 20ms during simulation mode. */
     @Override
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+    }
 
     /*********************/
     /*** DISABLED MODE ***/
@@ -109,27 +135,60 @@ public class Robot extends LoggedRobot {
 
     /** This method is called each time when the robot is disabled. */
     @Override
-    public void disabledInit() {}
-
-    /** This method is called every 20ms when the robot is disabled. */
-    @Override
-    public void disabledPeriodic() {}
+    public void disabledInit() {
+    }
 
     /***********************/
     /*** AUTONOMOUS MODE ***/
     /***********************/
 
+    private void ifAutonNotNull(Consumer<Auton> consumer) {
+        if (auto != null) {
+            consumer.accept(auto);
+        }
+    }
+
+    private void setAuto(Auton newAuto) {
+        ifAutonNotNull(Auton::clearPaths);
+        auto = newAuto;
+        ifAutonNotNull(Auton::displayPaths);
+    }
+
     /** This method is called at the start of autonomous mode. */
     @Override
-    public void autonomousInit() {}
+    public void autonomousInit() {
+        if (!wasAutonomous) {
+            autonomousSelected();
+            wasAutonomous = true;
+        }
+
+        ifAutonNotNull(Auton::clearPaths);
+        auto = robot.getAutonomousCommand();
+        ifAutonNotNull(a -> CommandScheduler.getInstance().schedule(a.getCommand()));
+    }
 
     /** This method is called every 20ms during autonomous mode. */
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+    }
 
     /** This method is called when autonomous mode ends. */
     @Override
-    public void autonomousExit() {}
+    public void autonomousExit() {
+        ifAutonNotNull(a -> CommandScheduler.getInstance().cancel(a.getCommand()));
+    }
+
+    public void autonomousSelected() {
+        setAuto(robot.getAutonomousCommand());
+        robot.onAutonChanged(this::setAuto);
+    }
+
+    public void autonomousClosed() {
+        ifAutonNotNull(a -> CommandScheduler.getInstance().cancel(a.getCommand()));
+        ifAutonNotNull(Auton::clearPaths);
+        
+        robot.onAutonChanged(null);
+    }
 
     /*******************/
     /*** TELEOP MODE ***/
@@ -137,15 +196,18 @@ public class Robot extends LoggedRobot {
 
     /** This method is called at the start of teleop mode. */
     @Override
-    public void teleopInit() {}
+    public void teleopInit() {
+    }
 
     /** This method is called every 20ms in teleop mode. */
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+    }
 
     /** This method is called when teleop mode ends. */
     @Override
-    public void teleopExit() {}
+    public void teleopExit() {
+    }
 
     /*****************/
     /*** TEST MODE ***/
@@ -159,9 +221,11 @@ public class Robot extends LoggedRobot {
 
     /** This method is called every 20ms in test mode. */
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+    }
 
     /** This method is called when test mode ends. */
     @Override
-    public void testExit() {}
+    public void testExit() {
+    }
 }

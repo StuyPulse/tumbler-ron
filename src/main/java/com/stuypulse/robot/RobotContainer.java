@@ -6,15 +6,20 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.Auton;
+import com.stuypulse.robot.commands.auton.AutonFactory;
 import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.DriverConstants;
 import com.stuypulse.robot.constants.FieldConstants;
 import com.stuypulse.robot.subsystems.intake.Intake;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import java.util.function.Consumer;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -80,7 +85,9 @@ public class RobotContainer {
     /**************/
 
     /** This method is used to configure the autonomous commands. */
-    public void configureAutons() {}
+    public void configureAutons() {
+        AutonFactory factory = new AutonFactory(swerve);
+    }
 
     public void configureSysID() {}
 
@@ -91,5 +98,9 @@ public class RobotContainer {
      */
     public Auton getAutonomousCommand() {
         return autonChooser.get();
+    }
+
+    public void onAutonChanged(Consumer<Auton> callback) {
+        autonChooser.onChange(callback);
     }
 }
