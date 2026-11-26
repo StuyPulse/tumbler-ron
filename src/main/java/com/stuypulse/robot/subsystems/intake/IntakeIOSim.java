@@ -56,9 +56,11 @@ public class IntakeIOSim extends IntakeIOReal {
         super.leaderConnected = () -> true;
         super.followerConnected = () -> true;
         super.statorCurrent = () -> rollerMotorLeader.getMotorCurrent();
-        super.supplyCurrent = () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
+        super.supplyCurrent =
+                () -> statorCurrent.getAsDouble() * Math.abs(rollerMotorLeader.getAppliedOutput());
         super.temperature = () -> simulatedTemperatureCelsius;
-        super.appliedVoltage = () -> rollerMotorLeader.getBusVoltage() * rollerMotorLeader.getAppliedOutput();
+        super.appliedVoltage =
+                () -> rollerMotorLeader.getBusVoltage() * rollerMotorLeader.getAppliedOutput();
         super.velocity = () -> rollerMotorLeader.getVelocity();
     }
 

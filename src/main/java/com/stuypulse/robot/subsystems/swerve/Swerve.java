@@ -17,11 +17,16 @@ import com.stuypulse.robot.constants.FieldConstants;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.constants.GlobalSettings.Mode;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveGains;
+import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveTolerances;
+import com.stuypulse.robot.util.swerve.DriveInputProcessor;
+import com.stuypulse.robot.util.swerve.DriveTurnInputProcessor;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,6 +41,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
@@ -43,6 +49,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -353,12 +361,191 @@ public class Swerve extends SubsystemBase {
         stop();
     }
 
+    /************************/
+    /*** SWERVE COMMANDS ***/
+    /**********************/
+
     public Command followPathPlannerPathCommand(PathPlannerPath path) {
         return AutoBuilder.followPath(path);
     }
 
     public FollowPath followBlinePath(Path path) {
         return pathBuilder.build(path);
+    }
+
+    public Command joystickDrive(CommandXboxController controller) {
+        DriveInputProcessor speed = DriveInputProcessor.getDefaultProcessor(controller);
+        DriveTurnInputProcessor turn = DriveTurnInputProcessor.getDefaultProcessor(controller);
+
+        return run(() -> {
+                    if (this.shouldIgnoreJoysticks) {
+                        return;
+                    }
+                    speed.update();
+                    turn.update();
+
+                    ChassisSpeeds speeds =
+                            new ChassisSpeeds(
+                                    speed.get().getX(),
+                                    speed.get().getY(),
+                                    -turn.get().in(RadiansPerSecond));
+
+                    boolean isFlipped = !Robot.isBlue();
+
+                    ChassisSpeeds robotRelative =
+                            ChassisSpeeds.fromFieldRelativeSpeeds(
+                                    speeds,
+                                    isFlipped
+                                            ? getRotation().plus(new Rotation2d(Math.PI))
+                                            : getRotation());
+
+                    Logger.recordOutput(
+                            "Drive/ChassisSpeeds/FromDriveInputProcessor", robotRelative);
+                    runVelocity(robotRelative);
+                })
+                .withName("Joystick Drive");
+    }
+
+    public Command joystickDriveFacing(CommandXboxController driver, Rotation2d rotation) {
+        DriveInputProcessor speed = DriveInputProcessor.getDefaultProcessor(driver);
+        PIDController headingController =
+                new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+        return run(() -> {
+                    speed.update();
+                    Translation2d velocity = speed.get();
+
+                    double omega =
+                            headingController.calculate(
+                                    getRotation().getRadians(),
+                                    rotation.getRadians()); // rotation.get?
+
+                    ChassisSpeeds speeds =
+                            new ChassisSpeeds(velocity.getX(), velocity.getY(), omega);
+
+                    boolean isFlipped = !Robot.isBlue();
+                    runVelocity(
+                            ChassisSpeeds.fromFieldRelativeSpeeds(
+                                    speeds,
+                                    isFlipped
+                                            ? getRotation().plus(new Rotation2d(Math.PI))
+                                            : getRotation()));
+
+                    Logger.recordOutput(
+                            "Swerve/Angle Minus Target Angle",
+                            getPose().getRotation().minus(rotation).getDegrees());
+                    Logger.recordOutput(
+                            "Swerve/Facing Angle", getPose().getRotation().getDegrees());
+                })
+                .beforeStarting(headingController::reset)
+                .finallyDo(headingController::close)
+                .withName("Joystick Drive Facing Angle");
+    }
+
+    /** ALIGNMENT COMMANDS */
+    private Rotation2d getTargetAlignmentAngle(Pose2d targetPose) {
+        double atan =
+                Math.atan2(
+                        targetPose.getY() - getPose().getY(), targetPose.getX() - getPose().getX());
+        return new Rotation2d(atan);
+    }
+
+    public Command joystickDriveWhileAligned(
+            CommandXboxController controller, Supplier<Pose2d> targetPose) {
+        DriveInputProcessor speed = DriveInputProcessor.getDefaultProcessor(controller);
+        PIDController headingController =
+                new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+        return run(() -> {
+                    speed.update();
+                    Rotation2d targetAngle = getTargetAlignmentAngle(targetPose.get());
+
+                    double omega =
+                            headingController.calculate(
+                                    getRotation().getRadians(), targetAngle.getRadians());
+
+                    ChassisSpeeds speeds =
+                            new ChassisSpeeds(speed.get().getX(), speed.get().getY(), omega);
+                    runVelocity(speeds);
+                    Logger.recordOutput("Swerve/Target Angle", targetAngle.getDegrees());
+                    Logger.recordOutput("Swerve/Target Pose X", targetPose.get().getX());
+                    Logger.recordOutput("Swerve/Target Pose Y", targetPose.get().getY());
+                })
+                .beforeStarting(headingController::reset)
+                .finallyDo(headingController::close)
+                .withName("Joystick Drive While Aligning");
+    }
+
+    public Command alignTo(Supplier<Pose2d> targetPose) {
+        BooleanSupplier isAligned =
+                () ->
+                        Math.abs(
+                                        getPose()
+                                                .getRotation()
+                                                .minus(getTargetAlignmentAngle(targetPose.get()))
+                                                .getDegrees())
+                                > SwerveTolerances.THETA_TOLERANCE.getDegrees();
+
+        Debouncer alignmentDebouncer =
+                new Debouncer(SwerveTolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
+        PIDController headingController =
+                new PIDController(SwerveGains.akP, SwerveGains.akI, SwerveGains.akD);
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+        return run(() -> {})
+                .beforeStarting(headingController::reset)
+                .finallyDo(headingController::close)
+                .until(() -> alignmentDebouncer.calculate(isAligned.getAsBoolean()))
+                .withName("Align To Pose");
+    }
+
+    public Command alignToFerryZone() {
+        return alignTo(() -> FieldConstants.getFerryZonePose(getPose().getTranslation()))
+                .withName("Align To Ferry Zone");
+    }
+
+    public Command alignToHub() {
+        return alignTo(FieldConstants::getHubPose).withName("Align To Hub");
+    }
+
+    public Command joystickDriveWhileAlignedToFerryZone(CommandXboxController controller) {
+        return joystickDriveWhileAligned(
+                        controller,
+                        () -> FieldConstants.getFerryZonePose(getPose().getTranslation()))
+                .withName("Joystick Drive While Aligning To Ferry Zone");
+    }
+
+    public Command joystickDriveWhileAlignedToHub(CommandXboxController controller) {
+        return joystickDriveWhileAligned(controller, FieldConstants::getHubPose)
+                .withName("Joystick Drive While Aligning To Hub");
+    }
+
+    /** INSTANT COMMANDS */
+    public Command xMode() {
+        return runOnce(this::stopWithX).withName("Set X Mode");
+    }
+
+    public Command resetHeading() {
+        return runOnce(() -> resetHeading(Robot.isBlue() ? Rotation2d.kZero : Rotation2d.k180deg))
+                .withName("Reset Heading");
+    }
+
+    public Command resetPoseTo(Supplier<Pose2d> poseSupplier) {
+        return runOnce(() -> this.resetPose(poseSupplier.get())).withName("Reset Pose");
+    }
+
+    public Command resetPoseTo(Pose2d newPose) {
+        return resetPoseTo(() -> newPose);
+    }
+
+    public Command useJoysticks() {
+        return runOnce(() -> this.shouldIgnoreJoysticks = false).withName("Enable Joystick Input");
+    }
+
+    public Command ignoreJoysticks() {
+        return runOnce(() -> this.shouldIgnoreJoysticks = true).withName("Disable Joystick Input");
     }
 
     /** Returns the module states (turn angles and drive velocities) for all of the modules. */
@@ -417,7 +604,6 @@ public class Swerve extends SubsystemBase {
 
     public void resetHeading(Rotation2d heading) {
         poseEstimator.resetRotation(heading);
-        ;
     }
 
     /** Resets the current odometry pose. */

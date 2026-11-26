@@ -7,7 +7,6 @@ package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.Auton;
 import com.stuypulse.robot.commands.auton.AutonFactory;
-import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.DriverConstants;
 import com.stuypulse.robot.constants.FieldConstants;
 import com.stuypulse.robot.constants.GlobalSettings;
@@ -16,14 +15,11 @@ import com.stuypulse.robot.subsystems.intake.IntakeIO;
 import com.stuypulse.robot.subsystems.intake.IntakeIOReal;
 import com.stuypulse.robot.subsystems.intake.IntakeIOSim;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
 import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -79,7 +75,7 @@ public class RobotContainer {
     /** DEFAULTS ** */
     /** ************ */
     private void configureDefaultCommands() {
-        swerve.setDefaultCommand(new SwerveDriveDrive(driver));
+        swerve.setDefaultCommand(swerve.joystickDrive(driver));
         intake.setDefaultCommand(intake.stop());
     }
 
