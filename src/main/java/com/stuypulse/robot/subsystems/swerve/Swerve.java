@@ -77,45 +77,6 @@ public class Swerve extends SubsystemBase {
 
     static final Lock odometryLock = new ReentrantLock();
 
-    private static final Swerve instance;
-
-    static {
-        switch (GlobalSettings.CURRENT_MODE) {
-            case REAL -> {
-                instance =
-                        new Swerve(
-                                new GyroIOReal(),
-                                new ModuleIOReal(TunerConstants.FrontLeft),
-                                new ModuleIOReal(TunerConstants.FrontRight),
-                                new ModuleIOReal(TunerConstants.BackLeft),
-                                new ModuleIOReal(TunerConstants.BackRight));
-            }
-            case SIM -> {
-                instance =
-                        new Swerve(
-                                new GyroIO() {},
-                                new ModuleIOSim(TunerConstants.FrontLeft),
-                                new ModuleIOSim(TunerConstants.FrontRight),
-                                new ModuleIOSim(TunerConstants.BackLeft),
-                                new ModuleIOSim(TunerConstants.BackRight));
-            }
-
-            default -> {
-                instance =
-                        new Swerve(
-                                new GyroIO() {},
-                                new ModuleIO() {},
-                                new ModuleIO() {},
-                                new ModuleIO() {},
-                                new ModuleIO() {});
-            }
-        }
-    }
-
-    public static Swerve getInstance() {
-        return instance;
-    }
-
     private final FollowPath.Builder pathBuilder =
             new FollowPath.Builder(
                             this,

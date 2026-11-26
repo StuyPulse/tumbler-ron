@@ -14,7 +14,13 @@ import com.stuypulse.robot.subsystems.intake.Intake;
 import com.stuypulse.robot.subsystems.intake.IntakeIO;
 import com.stuypulse.robot.subsystems.intake.IntakeIOReal;
 import com.stuypulse.robot.subsystems.intake.IntakeIOSim;
+import com.stuypulse.robot.subsystems.swerve.GyroIO;
+import com.stuypulse.robot.subsystems.swerve.GyroIOReal;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOReal;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOSim;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
+import com.stuypulse.robot.subsystems.swerve.TunerConstants;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -39,7 +45,7 @@ public class RobotContainer {
             new CommandXboxController(DriverConstants.Driver.DRIVER_INDEX);
 
     // Subsystem
-    private final Swerve swerve = Swerve.getInstance();
+    private final Swerve swerve;
     private final Intake intake;
 
     // Autons
@@ -52,12 +58,33 @@ public class RobotContainer {
     public RobotContainer() {
         switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
+                swerve = new Swerve(
+                    new GyroIOReal(),
+                    new ModuleIOReal(TunerConstants.FrontLeft),
+                    new ModuleIOReal(TunerConstants.FrontRight),
+                    new ModuleIOReal(TunerConstants.BackLeft),
+                    new ModuleIOReal(TunerConstants.BackRight)
+                );
                 intake = new Intake(new IntakeIOReal());
             }
             case SIM -> {
+                swerve = new Swerve(
+                    new GyroIO() {}, 
+                    new ModuleIOSim(TunerConstants.FrontLeft),
+                    new ModuleIOSim(TunerConstants.FrontRight),
+                    new ModuleIOSim(TunerConstants.BackLeft),
+                    new ModuleIOSim(TunerConstants.BackRight)
+                );
                 intake = new Intake(new IntakeIOSim());
             }
             default -> {
+                swerve = new Swerve(
+                    new GyroIOReal(),
+                    new ModuleIOReal(TunerConstants.FrontLeft),
+                    new ModuleIOReal(TunerConstants.FrontRight),
+                    new ModuleIOReal(TunerConstants.BackLeft),
+                    new ModuleIOReal(TunerConstants.BackRight)
+                );
                 intake = new Intake(new IntakeIO() {});
             }
         }
